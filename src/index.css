@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--autofill-color) !important;
+}
