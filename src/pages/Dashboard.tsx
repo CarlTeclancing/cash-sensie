@@ -1,6 +1,6 @@
 import React from "react";
-import SummaryComp from "../components/SummaryComp";
-import Chart from "../components/Chart";
+import SummaryComp from "../components/ui/SummaryComp";
+import Chart from "../components/ui/Chart";
 
 const Dashboard = () => {
   return (

@@ -1,45 +1,45 @@
-import logo from "../assets/logo.svg";
-import MenuButton from "./MenuButton";
-import dashbIconActive from "../assets/dashboard-icon-focus.svg";
-import dashbIcon from "../assets/dashboard-icon.svg";
-import debits from "../assets/debits.png";
-import debitsFocus from "../assets/debits-focus.png";
-import transactions from "../assets/transactions.png";
-import transactionsFocus from "../assets/transactions-focus.png";
-import savings from "../assets/savings.png";
-import savingsFocus from "../assets/savings-focus.png";
-import settings from "../assets/settings.png";
-import settingsFocus from "../assets/settings-focus.png";
-import taxes from "../assets/taxes.png";
-import taxesFocus from "../assets/taxes-focus.png";
-import activities from "../assets/activities.png";
-import activitiesFocus from "../assets/activities-focus.png";
-import logoutIcon from "../assets/logut-icon.png";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import darkLogo from "../assets/dark-logo.png";
-import { useAppStore } from "../store/store";
+import logo from "../../assets/logo.svg";
+import MenuButton from "../ui/MenuButton";
+import dashbIconActive from "../../assets/dashboard-icon-focus.svg";
+import dashbIcon from "../../assets/dashboard-icon.svg";
+import debits from "../../assets/debits.png";
+import debitsFocus from "../../assets/debits-focus.png";
+import transactions from "../../assets/transactions.png";
+import transactionsFocus from "../../assets/transactions-focus.png";
+import savings from "../../assets/savings.png";
+import savingsFocus from "../../assets/savings-focus.png";
+import settings from "../../assets/settings.png";
+import settingsFocus from "../../assets/settings-focus.png";
+import taxes from "../../assets/taxes.png";
+import taxesFocus from "../../assets/taxes-focus.png";
+import activities from "../../assets/activities.png";
+import activitiesFocus from "../../assets/activities-focus.png";
+import logoutIcon from "../../assets/logut-icon.png";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
+import darkLogo from "../../assets/dark-logo.png";
+import { useAppStore } from "../../store/store";
 import { useLocation } from "react-router";
-import { useWindowSize } from "../hooks/useWindowSize";
-import { MOBILE_SIZE } from "../constants/constants";
-import MobileMenuButton from "./MobileMenuButton";
-import dashboardIconRed from "../assets/dashboard-icon-red.png";
-import savingsRedIcon from "../assets/savings-icon-red.png";
-import debitsRedIcon from "../assets/debits-icon-red.png";
-import transactionsRedIcon from "../assets/transactions-icon-red.png";
-import plusIcon from "../assets/plus-icon.png";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { MOBILE_SIZE } from "../../constants/constants";
+import MobileMenuButton from "../ui/MobileMenuButton";
+import dashboardIconRed from "../../assets/dashboard-icon-red.png";
+import savingsRedIcon from "../../assets/savings-icon-red.png";
+import debitsRedIcon from "../../assets/debits-icon-red.png";
+import transactionsRedIcon from "../../assets/transactions-icon-red.png";
+import plusIcon from "../../assets/plus-icon.png";
 
 const Sidebar = () => {
   const { width } = useWindowSize();
   const location = useLocation().pathname;
   const firstLocation = location.split(`/`).filter(Boolean)[0] || "dashboard";
-  const { isDarkMode,toggleAddTransactionsForm } = useAppStore();
+  const { isDarkMode, toggleAddTransactionsForm } = useAppStore();
   const isActive = (location: string) =>
     location.toLowerCase() === firstLocation.toLowerCase();
   return (
     <div
-      className="w-full py-4   fixed bottom-0 left-0 md:bottom-auto md:top-0  md:w-1/5 flex items-center justify-center md:justify-between h-1/9 md:h-screen flex-row md:flex-col rounded-t-3xl px-10 md:px-0 md:rounded-t-none"
+      className="w-full py-4   fixed bottom-0 left-0 md:bottom-auto md:top-0  md:w-1/5 flex items-center justify-center md:justify-between h-1/9 md:h-screen flex-row md:flex-col rounded-t-3xl px-10 md:px-0 md:rounded-t-none z-50"
       style={{
-        backgroundColor: `${isDarkMode ? (width < MOBILE_SIZE ? DARK_MODE_COLORS.background : DARK_MODE_COLORS.darkBlue) : width < MOBILE_SIZE ? COLORS.background : COLORS.white}`,
+        backgroundColor: `${isDarkMode ? (width < MOBILE_SIZE ? DARK_MODE_COLORS.darkBlue : DARK_MODE_COLORS.darkBlue) : width < MOBILE_SIZE ? COLORS.white : COLORS.white}`,
         borderTop: `${width < MOBILE_SIZE ? `1px solid ${COLORS.green}` : ``} `,
       }}
     >
@@ -52,7 +52,6 @@ const Sidebar = () => {
               backgroundColor: isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue,
             }}
             onClick={toggleAddTransactionsForm}
-
           >
             <img src={plusIcon} alt="" className="w-5 h-5" />
           </div>

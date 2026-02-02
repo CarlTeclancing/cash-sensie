@@ -2,10 +2,10 @@ import loginImage from "../assets/login-page-image.png";
 import logo from "../assets/logo.svg";
 import darkModeLogo from "../assets/dark-logo.png";
 import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import LoginPageInputs from "../components/LoginPageInputs";
+import LoginPageInputs from "../components/ui/LoginPageInputs";
 import { Link } from "react-router";
-import LineWithText from "../components/LineWithText";
-import LoginPageButton from "../components/LoginPageButton";
+import LineWithText from "../components/ui/LineWithText";
+import LoginPageButton from "../components/ui/LoginPageButton";
 import { useRef, useState } from "react";
 
 type props = {

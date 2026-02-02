@@ -6,7 +6,7 @@ import {
   type RefObject,
 } from "react";
 import { Eye, EyeClosed } from "lucide-react";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
 
 type props = {
   isDarkMode: boolean;

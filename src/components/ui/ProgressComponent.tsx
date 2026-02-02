@@ -1,5 +1,5 @@
-import { COLORS } from "../constants/constants";
-import { useAppStore } from "../store/store";
+import { COLORS } from "../../constants/constants";
+import { useAppStore } from "../../store/store";
 
 type props = {
   isOn: boolean;
@@ -7,7 +7,11 @@ type props = {
 };
 
 const ProgressComponent = ({ isOn, text }: props) => {
-  const { changeRegisterPage, completedPagesRegister, updateCompletedPagesRegister } = useAppStore();
+  const {
+    changeRegisterPage,
+    completedPagesRegister,
+    updateCompletedPagesRegister,
+  } = useAppStore();
   return (
     <div className="w-1/4">
       <div className="flex items-center justify-center">
@@ -24,7 +28,8 @@ const ProgressComponent = ({ isOn, text }: props) => {
           }}
           onClick={() => {
             if (parseInt(text) > (completedPagesRegister || 0)) return;
-            updateCompletedPagesRegister && updateCompletedPagesRegister(parseInt(text) - 1);
+            updateCompletedPagesRegister &&
+              updateCompletedPagesRegister(parseInt(text) - 1);
             changeRegisterPage && changeRegisterPage(parseInt(text));
           }}
         >

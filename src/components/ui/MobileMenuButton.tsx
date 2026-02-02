@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import { useAppStore } from "../store/store";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
+import { useAppStore } from "../../store/store";
 import { Link } from "react-router";
-
 
 type MenuButtonProps = {
   content: string;
@@ -11,7 +10,6 @@ type MenuButtonProps = {
   iconActive: string;
 };
 
-
 const MobileMenuButton = ({
   content,
   isActive,
@@ -19,17 +17,17 @@ const MobileMenuButton = ({
   iconActive,
 }: MenuButtonProps) => {
   return (
-    <Link to={ content.toLowerCase() === 'home' ? '/' : `/${content.toLowerCase()}`}>
-      <div
-        className="cursor-pointer flex flex-col items-center rounded-md gap-0.5  font-semibold text-md "
-      >
+    <Link
+      to={content.toLowerCase() === "home" ? "/" : `/${content.toLowerCase()}`}
+    >
+      <div className="cursor-pointer flex flex-col items-center rounded-md gap-0.5  font-semibold text-md ">
         <div className=" flex items-center">
-          <img src={isActive  ? iconActive : icon} alt="" />
+          <img src={isActive ? iconActive : icon} alt="" />
         </div>
         <span
           className="text-xs"
           style={{
-            color: `${isActive  ? COLORS.red : COLORS.grey}`,
+            color: `${isActive ? COLORS.red : COLORS.grey}`,
           }}
         >
           {content}
@@ -39,4 +37,4 @@ const MobileMenuButton = ({
   );
 };
 
-export default MobileMenuButton
+export default MobileMenuButton;

@@ -1,14 +1,16 @@
-import React, { useState } from "react";
-import { useAppStore } from "../store/store";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import { ArrowLeft, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { useAppStore } from "../../store/store";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
+import { X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useWindowSize } from "../hooks/useWindowSize";
-import { MOBILE_SIZE } from "../constants/constants";
-import leftArrow from "../assets/left-arrow.png";
+import { useWindowSize } from "../../hooks/useWindowSize";
+import { MOBILE_SIZE } from "../../constants/constants";
+import leftArrow from "../../assets/left-arrow.png";
+import "emoji-picker-element";
 
 type TransactionData = {
   title: string;
+  emoji: string;
   amount: number;
   category: string;
   date: string;
@@ -24,6 +26,7 @@ const AddTransactionForm = () => {
   const { width, height } = useWindowSize();
   const [transactionData, setTransactionData] = useState<TransactionData>({
     title: "",
+    emoji: "",
     amount: 0,
     category: "",
     date: "",
@@ -109,6 +112,17 @@ const AddTransactionForm = () => {
                   />
                 </div>
 
+                <EmojiPickerWrapper
+                  selectedEmoji={transactionData.emoji}
+                  isDarkMode={isDarkMode}
+                  onEmojiClick={(unicode: string) => {
+                    setTransactionData({
+                      ...transactionData,
+                      emoji: unicode,
+                    });
+                  }}
+                />
+
                 <div className="flex w-full gap-2 flex-col">
                   <label htmlFor="transaction-type">Transaction Type</label>
                   <select
@@ -180,6 +194,127 @@ const AddTransactionForm = () => {
         </div>
       )}
     </AnimatePresence>
+  );
+};
+
+const EmojiPickerWrapper = ({
+  onEmojiClick,
+  isDarkMode,
+  selectedEmoji,
+}: {
+  onEmojiClick: (unicode: string) => void;
+  isDarkMode: boolean;
+  selectedEmoji: string;
+}) => {
+  const pickerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (pickerRef.current && isOpen) {
+      // Check if picker already exists to avoid recreating
+      if (pickerRef.current.querySelector("emoji-picker")) {
+        return;
+      }
+
+      const picker = document.createElement("emoji-picker");
+
+      // Apply theme and styling to emoji picker
+      picker.style.width = "100%";
+      picker.style.setProperty(
+        "--background",
+        isDarkMode ? "#000000" : "#FFFFFF",
+      );
+      picker.style.setProperty(
+        "--border-color",
+        isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue,
+      );
+      picker.style.setProperty(
+        "--input-border-color",
+        isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue,
+      );
+      picker.style.setProperty(
+        "--input-font-color",
+        isDarkMode ? "#FFFFFF" : "#000000",
+      );
+      picker.style.setProperty(
+        "--input-placeholder-color",
+        isDarkMode ? COLORS.grey : COLORS.headerGrey,
+      );
+      picker.style.setProperty("--input-border-radius", "0.375rem");
+
+      if (isDarkMode) {
+        picker.classList.add("dark");
+      }
+
+      const handleEmojiClick = (event: any) => {
+        onEmojiClick(event.detail.unicode);
+        setIsOpen(false);
+      };
+
+      picker.addEventListener("emoji-click", handleEmojiClick);
+
+      pickerRef.current.appendChild(picker);
+
+      return () => {
+        picker.removeEventListener("emoji-click", handleEmojiClick);
+        picker.remove();
+      };
+    }
+  }, [isOpen, isDarkMode]);
+
+  // Close picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      // Delay adding the listener to prevent immediate closing
+      setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+      }, 100);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  return (
+    <div className="flex w-full gap-2 flex-col relative" ref={containerRef}>
+      <label>Select an Emoji</label>
+      <button
+        type="button"
+        className="w-full focus:outline-none h-9 rounded-md px-2 flex items-center justify-between"
+        style={{
+          border: `1px solid ${isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue}`,
+          backgroundColor: isDarkMode
+            ? DARK_MODE_COLORS.darkBlue
+            : COLORS.white,
+          color: isDarkMode ? COLORS.white : COLORS.black,
+        }}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{selectedEmoji || "Click to select an emoji"}</span>
+        <span style={{ color: COLORS.grey }}>{isOpen ? "▲" : "▼"}</span>
+      </button>
+      {isOpen && (
+        <div
+          className="absolute top-full left-0 w-full mt-1 z-50 rounded-md shadow-lg overflow-hidden"
+          style={{
+            backgroundColor: isDarkMode ? "#000000" : "#FFFFFF",
+          }}
+        >
+          <div ref={pickerRef} style={{ width: "100%" }}></div>
+        </div>
+      )}
+    </div>
   );
 };
 

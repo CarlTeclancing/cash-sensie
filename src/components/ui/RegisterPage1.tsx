@@ -1,9 +1,9 @@
-import { COLORS } from "../constants/constants";
+import { COLORS } from "../../constants/constants";
 import LoginPageInputs from "./LoginPageInputs";
 import { Link } from "react-router";
 import LineWithText from "./LineWithText";
 import LoginPageButton from "./LoginPageButton";
-import { useAppStore } from "../store/store";
+import { useAppStore } from "../../store/store";
 import { useRef, useState, type FocusEvent } from "react";
 
 type props = {
@@ -20,8 +20,13 @@ const RegisterPage1 = ({ isDarkMode }: props) => {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const { incrementRegisterPage, updateRegistrationData, registrationData, completedPagesRegister, updateCompletedPagesRegister } =
-    useAppStore();
+  const {
+    incrementRegisterPage,
+    updateRegistrationData,
+    registrationData,
+    completedPagesRegister,
+    updateCompletedPagesRegister,
+  } = useAppStore();
   const [errors, setErrors] = useState<errors>({
     name: "",
     email: "",
@@ -61,7 +66,6 @@ const RegisterPage1 = ({ isDarkMode }: props) => {
   };
 
   const submitHandler = () => {
-
     if (!registrationData.name) {
       setErrors((prev) => ({
         ...prev,
@@ -91,7 +95,8 @@ const RegisterPage1 = ({ isDarkMode }: props) => {
       registrationData.email &&
       registrationData.password
     ) {
-      updateCompletedPagesRegister && updateCompletedPagesRegister((completedPagesRegister + 1) || 1)
+      updateCompletedPagesRegister &&
+        updateCompletedPagesRegister(completedPagesRegister + 1 || 1);
       incrementRegisterPage && incrementRegisterPage();
     } else {
       if (errors.name || !registrationData.name) {

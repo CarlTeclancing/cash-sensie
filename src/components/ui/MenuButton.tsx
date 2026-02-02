@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import { useAppStore } from "../store/store";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
+import { useAppStore } from "../../store/store";
 import { Link } from "react-router";
 
 type MenuButtonProps = {

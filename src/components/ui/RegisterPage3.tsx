@@ -1,12 +1,17 @@
-import { COLORS } from "../constants/constants";
+import { COLORS } from "../../constants/constants";
 import LoginPageButton from "./LoginPageButton";
-import { useAppStore } from "../store/store";
+import { useAppStore } from "../../store/store";
 import { useRef, useState } from "react";
 
 type props = { isDarkMode: boolean };
 const RegisterPage3 = ({ isDarkMode }: props) => {
-  const { incrementRegisterPage, updateRegistrationData, registrationData, updateCompletedPagesRegister, completedPagesRegister } =
-    useAppStore();
+  const {
+    incrementRegisterPage,
+    updateRegistrationData,
+    registrationData,
+    updateCompletedPagesRegister,
+    completedPagesRegister,
+  } = useAppStore();
   const checkboxRef = useRef<HTMLInputElement>(null);
   const [isChecked, setIsChecked] = useState(false);
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,8 +24,8 @@ const RegisterPage3 = ({ isDarkMode }: props) => {
       setError("Please accept the terms and conditions");
       return;
     }
-      updateCompletedPagesRegister &&
-        updateCompletedPagesRegister(completedPagesRegister + 1 || 1);
+    updateCompletedPagesRegister &&
+      updateCompletedPagesRegister(completedPagesRegister + 1 || 1);
     incrementRegisterPage && incrementRegisterPage();
   };
 

@@ -1,7 +1,7 @@
-import { COLORS } from "../constants/constants";
+import { COLORS } from "../../constants/constants";
 import LoginPageButton from "./LoginPageButton";
-import ArrowUp from "../assets/RegisterArrowUp.png";
-import ArrowUpDark from "../assets/RegisterArrowUpDark.png"
+import ArrowUp from "../../assets/RegisterArrowUp.png";
+import ArrowUpDark from "../../assets/RegisterArrowUpDark.png";
 
 type props = { isDarkMode: boolean };
 

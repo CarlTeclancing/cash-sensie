@@ -1,27 +1,26 @@
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
 import Tests from "./pages/Tests";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import NotFound from "./pages/NotFound";
 import { useAppStore } from "./store/store";
-import { Moon, Sun } from "lucide-react";
 import { COLORS, DARK_MODE_COLORS } from "./constants/constants";
 import { useWindowSize } from "./hooks/useWindowSize";
-import Layout from "./components/Layout";
+import Layout from "./components/layout/Layout";
 import Transactions from "./pages/Transactions";
 import Dashboard from "./pages/Dashboard";
+import Settings from "./pages/Settings";
 
 const App = () => {
   const { width } = useWindowSize();
   const { isDarkMode, toggleDarkMode } = useAppStore();
   useEffect(() => {
-    document.querySelector("body")!.style.backgroundColor =
+    document.querySelector  ("body")!.style.backgroundColor =
       `${isDarkMode ? (width < 768 ? DARK_MODE_COLORS.darkBlue : DARK_MODE_COLORS.background) : width < 768 ? COLORS.white : COLORS.background}`;
   });
   return (
     <div>
-
       <BrowserRouter>
         <Routes>
           <Route
@@ -30,15 +29,15 @@ const App = () => {
           />
           <Route path="/login" element={<Login isDarkMode={isDarkMode} />} />
           <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard/>} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/tests" element={<Tests />} />
-            <Route path="/dashboard" element={<Dashboard/>} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/savings" element={<h1>Savings</h1>} />
             <Route path="/debits" element={<h1>Debits</h1>} />
-            <Route path="/settings" element={<h1>Settings</h1>} />
+            <Route path="/settings" element={<Settings />}  />
           </Route>
-          <Route path="*" element={<h1>404 NOT FOUND</h1>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </div>

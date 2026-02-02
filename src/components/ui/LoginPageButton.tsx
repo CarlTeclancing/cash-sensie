@@ -1,4 +1,4 @@
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
 
 type props = {
   isDarkMode: boolean;

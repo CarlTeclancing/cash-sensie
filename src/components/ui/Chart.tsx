@@ -1,9 +1,8 @@
-import React from "react";
 import Bar from "./Bar";
-import { useAppStore } from "../store/store";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import bars from "../assets/blue-bars-icon.png";
-import barsDark from "../assets/blue-bars-icon-dark.png"
+import { useAppStore } from "../../store/store";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
+import bars from "../../assets/blue-bars-icon.png";
+import barsDark from "../../assets/blue-bars-icon-dark.png";
 
 const Chart = () => {
   const { isDarkMode } = useAppStore();
@@ -49,15 +48,18 @@ const Chart = () => {
             y1="0"
             x2="100%"
             y2="0"
-            stroke={isDarkMode? DARK_MODE_COLORS.blue : COLORS.blue}
+            stroke={isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue}
             strokeWidth="1"
             strokeDasharray="10 5"
           />
         </svg>
 
-        <span className=" text-xs font-bold whitespace-nowrap" style={{
-          color: `${isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue}`
-        }}>
+        <span
+          className=" text-xs font-bold whitespace-nowrap"
+          style={{
+            color: `${isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue}`,
+          }}
+        >
           $179
         </span>
       </div>

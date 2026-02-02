@@ -1,13 +1,13 @@
 import React, { type CSSProperties } from "react";
-import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
+import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
 import { useLocation } from "react-router";
 import { Search, Plus } from "lucide-react";
-import { useAppStore } from "../store/store";
-import pict from "../assets/Avatar.png";
-import mimLogo from "../assets/mini-logo.png";
-import miniDarkLogo from "../assets/mini-logo-dark.png";
-import { MOBILE_SIZE } from "../constants/constants";
-import { useWindowSize } from "../hooks/useWindowSize";
+import { useAppStore } from "../../store/store";
+import pict from "../../assets/Avatar.png";
+import mimLogo from "../../assets/mini-logo.png";
+import miniDarkLogo from "../../assets/mini-logo-dark.png";
+import { MOBILE_SIZE } from "../../constants/constants";
+import { useWindowSize } from "../../hooks/useWindowSize";
 
 const Header = () => {
   const { width } = useWindowSize();
@@ -63,7 +63,11 @@ const Header = () => {
           placeholder="Search..."
         />
       </div>
-      <img src={pict} alt="Avatar" className="w-13 h-13 md:hidden rounded-full" />
+      <img
+        src={pict}
+        alt="Avatar"
+        className="w-13 h-13 md:hidden rounded-full"
+      />
 
       <div className="md:flex justify-between hidden  md:gap-14  items-center">
         <div className="flex items-center relative">

@@ -2,14 +2,13 @@ import loginImage from "../assets/login-page-image.png";
 import logo from "../assets/logo.svg";
 import darkModeLogo from "../assets/dark-logo.png";
 import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
-import RegisterPage1 from "../components/RegisterPage1";
-import ProgressComponent from "../components/ProgressComponent";
-import RegisterProgressBar from "../components/RegisterProgressBar";
-import RegisterPage2 from "../components/RegisterPage2";
-import RegisterPage3 from "../components/RegisterPage3";
-import RegisterFinalPage from "../components/RegisterFinalPage";
+import RegisterPage1 from "../components/ui/RegisterPage1";
+import ProgressComponent from "../components/ui/ProgressComponent";
+import RegisterProgressBar from "../components/ui/RegisterProgressBar";
+import RegisterPage2 from "../components/ui/RegisterPage2";
+import RegisterPage3 from "../components/ui/RegisterPage3";
+import RegisterFinalPage from "../components/ui/RegisterFinalPage";
 import { useAppStore } from "../store/store";
-
 
 type props = {
   isDarkMode: boolean;
@@ -28,9 +27,9 @@ const Register = ({ isDarkMode }: props) => {
         <div
           className={`flex w-9/11 md:w-7/11 flex-col gap-6.5 justify-center items-center`}
         >
-          <RegisterProgressBar progress={currentRegisterPage || 1}/>
+          <RegisterProgressBar progress={currentRegisterPage || 1} />
           <img src={isDarkMode ? darkModeLogo : logo} alt="logo" />
-          
+
           {currentRegisterPage === 1 && (
             <RegisterPage1 isDarkMode={isDarkMode} />
           )}

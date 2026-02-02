@@ -2,8 +2,8 @@ import React from "react";
 import Header from "./Header";
 import { Outlet } from "react-router";
 import Sidebar from "./Sidebar";
-import FloatingIcon from "./FloatingIcon";
-import AddTransactionForm from "./AddTransactionForm";
+import FloatingIcon from "../ui/FloatingIcon";
+import AddTransactionForm from "../ui/AddTransactionForm";
 
 const Layout = () => {
   return (

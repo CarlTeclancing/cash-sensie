@@ -1,7 +1,7 @@
-import { COLORS } from "../constants/constants";
+import { COLORS } from "../../constants/constants";
 import LoginPageInputs from "./LoginPageInputs";
 import LoginPageButton from "./LoginPageButton";
-import { useAppStore } from "../store/store";
+import { useAppStore } from "../../store/store";
 import { useRef, useState } from "react";
 
 type props = {
@@ -19,8 +19,13 @@ const RegisterPage2 = ({ isDarkMode }: props) => {
   const addresRef = useRef<HTMLInputElement>(null);
   const occupationRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
-  const { incrementRegisterPage, updateRegistrationData, registrationData, completedPagesRegister, updateCompletedPagesRegister } =
-    useAppStore();
+  const {
+    incrementRegisterPage,
+    updateRegistrationData,
+    registrationData,
+    completedPagesRegister,
+    updateCompletedPagesRegister,
+  } = useAppStore();
   const [errors, setErrors] = useState<errors>({
     address: "",
     occupation: "",
@@ -184,7 +189,15 @@ const RegisterPage2 = ({ isDarkMode }: props) => {
             type={"date"}
             ref={dateRef}
             errorMsg={errors.date}
-            max={new Date(today.getFullYear() - 13, today.getMonth(), today.getDate()).toISOString().split("T")[0]}
+            max={
+              new Date(
+                today.getFullYear() - 13,
+                today.getMonth(),
+                today.getDate(),
+              )
+                .toISOString()
+                .split("T")[0]
+            }
             min={"1900-01-01"}
             value={registrationData.dateOfBirth}
             onBlur={(el) => {

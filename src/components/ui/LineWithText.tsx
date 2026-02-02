@@ -1,25 +1,29 @@
-import React from 'react'
-import { COLORS } from '../constants/constants'
+import React from "react";
+import { COLORS } from "../../constants/constants";
 
 type props = {
-  text: string
-}
+  text: string;
+};
 
-const LineWithText = ({text}: props) => {
+const LineWithText = ({ text }: props) => {
   return (
     <div className="reative w-full h-fit items-center justify-between flex">
       <div
-        className='opacity-50'
+        className="opacity-50"
         style={{
           width: "46%",
           border: `1px solid ${COLORS.grey}`,
         }}
       ></div>
-      <span style={{
-        color: COLORS.grey
-      }}>{text}</span>
+      <span
+        style={{
+          color: COLORS.grey,
+        }}
+      >
+        {text}
+      </span>
       <div
-        className='opacity-50'
+        className="opacity-50"
         style={{
           width: "46%",
           border: `1px solid ${COLORS.grey}`,
@@ -27,6 +31,6 @@ const LineWithText = ({text}: props) => {
       ></div>
     </div>
   );
-}
+};
 
-export default LineWithText
+export default LineWithText;
