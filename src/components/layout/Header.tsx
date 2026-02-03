@@ -1,6 +1,6 @@
 import React, { type CSSProperties } from "react";
 import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
-import { useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { Search, Plus } from "lucide-react";
 import { useAppStore } from "../../store/store";
 import pict from "../../assets/Avatar.png";
@@ -23,10 +23,10 @@ const Header = () => {
         borderBottomColor: `${isDarkMode ? COLORS.grey : COLORS.blue}`,
       }}
     >
-      <div>
-        <div className="md:flex  hidden flex-col">
+      <div className="w-3/12 ">
+        <div className="md:flex   hidden flex-col">
           <span
-            className="text-sm font-semibold"
+            className="text-sm font-semibold w-full"
             style={{
               color: `${isDarkMode ? COLORS.white : COLORS.headerGrey}`,
             }}
@@ -46,6 +46,8 @@ const Header = () => {
           <img src={isDarkMode ? miniDarkLogo : mimLogo} alt="" />
         </div>
       </div>
+      
+      {/* Mobile Search */}
       <div className="flex md:hidden w-5/9 items-center relative">
         <Search color={COLORS.grey} size={18} className="absolute left-3" />
         <input
@@ -63,13 +65,16 @@ const Header = () => {
           placeholder="Search..."
         />
       </div>
-      <img
-        src={pict}
-        alt="Avatar"
-        className="w-13 h-13 md:hidden rounded-full"
-      />
+      {/* Mobile Avatar */}
+      <Link to="/settings">
+        <img
+          src={pict}
+          alt="Avatar"
+          className="w-13 h-13 md:hidden rounded-full"
+        />
+      </Link>
 
-      <div className="md:flex justify-between hidden  md:gap-14  items-center">
+      <div className="md:flex gap-7 justify-end hidden  w-9/12  items-center">
         <div className="flex items-center relative">
           <Search color={COLORS.grey} size={18} className="absolute left-3" />
           <input
@@ -88,14 +93,16 @@ const Header = () => {
           />
         </div>
         <button
-          className="bg-blue-500 hover:scale-105 ease-in-out transition-all text-white p-4  rounded-lg hidden  md:flex items-center justify-between px-6  "
+          className="bg-blue-500 hover:scale-105 ease-in-out transition-all text-white p-2 lg:p-4 rounded-full  lg:rounded-lg hidden  md:flex items-center justify-between lg:px-4  "
           style={{ backgroundColor: COLORS.red }}
           onClick={toggleAddTransactionsForm}
         >
-          <Plus color={COLORS.white} size={20} className="mr-4" />
-          <span color={COLORS.white}>Add Transaction</span>
+          <Plus color={COLORS.white} size={20} className="lg:mr-3" />
+          <span className="hidden lg:flex" color={COLORS.white}>Add Transaction</span>
         </button>
-        <img src={pict} alt="Avatar" className="w-13 h-13 rounded-full" />
+        <Link to="/settings">
+          <img src={pict} alt="Avatar" className="w-13 h-13 rounded-full" />
+        </Link>
       </div>
     </div>
   );

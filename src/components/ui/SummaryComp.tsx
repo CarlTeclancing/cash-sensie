@@ -25,7 +25,7 @@ const SummaryComp = () => {
 
   return (
     <div
-      className="px-4 py-8 md:p-10 rounded-xl w-11/12  md:w-auto items-center justify-center md:items-start flex flex-col gap-4"
+      className="px-4 py-8 md:p-10 rounded-xl w-11/12  md:w-full items-center justify-center md:items-start flex flex-col gap-4"
       style={{
         backgroundColor: `${isDarkMode ? (width < MOBILE_SIZE ? DARK_MODE_COLORS.background : DARK_MODE_COLORS.darkBlue) : width < MOBILE_SIZE ? COLORS.background : COLORS.white}`,
       }}

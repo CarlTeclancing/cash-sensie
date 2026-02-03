@@ -19,7 +19,7 @@ const FloatingIcon = () => {
       }}
       dragElastic={0.1}
       dragMomentum={false}
-      className=" bottom-30  z-10 right-2 md:top-2 md:left-2 md:bottom-auto md:right-auto p-2 rounded-full fixed"
+      className=" bottom-30  z-50 right-2 md:top-2 md:left-2 md:bottom-auto md:right-auto p-2 rounded-full fixed"
       onClick={toggleDarkMode}
       style={{
         backgroundColor: `${isDarkMode ? DARK_MODE_COLORS.blue : COLORS.grey}`,

@@ -8,7 +8,7 @@ const Chart = () => {
   const { isDarkMode } = useAppStore();
   return (
     <div
-      className="p-10 rounded-xl hidden md:flex flex-col gap-4"
+      className="p-10 rounded-xl hidden w-full md:flex flex-col gap-4"
       style={{
         backgroundColor: `${isDarkMode ? DARK_MODE_COLORS.darkBlue : COLORS.white}`,
       }}
@@ -63,7 +63,7 @@ const Chart = () => {
           $179
         </span>
       </div>
-      <div className="flex items-center justify-center gap-10">
+      <div className="flex items-center justify-between w-full">
         <Bar content="Mon" value={50} max={100} />
         <Bar content="Mon" value={20} max={100} />
         <Bar content="Mon" value={10} max={100} />

@@ -155,7 +155,9 @@ const Settings = () => {
                       ? DARK_MODE_COLORS.blue
                       : COLORS.blue
                     : isDarkMode
-                      ? DARK_MODE_COLORS.background
+                      ? isMobile
+                        ? DARK_MODE_COLORS.background
+                        : DARK_MODE_COLORS.darkBlue
                       : "#f5f5f5",
                 }}
               >
