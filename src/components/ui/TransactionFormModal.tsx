@@ -202,16 +202,14 @@ const TransactionFormModal = ({
                   <button
                     className="px-4 py-2 rounded-md font-semibold"
                     style={{
-                      backgroundColor: isDarkMode
-                        ? DARK_MODE_COLORS.blue
-                        : COLORS.blue,
-                      color: isValid
-                        ? COLORS.white
-                        : isDarkMode
-                          ? "rgba(255, 255, 255, 0.6)"
-                          : "rgba(255, 255, 255, 0.7)",
+                      backgroundColor: isValid
+                        ? isDarkMode
+                          ? DARK_MODE_COLORS.blue
+                          : COLORS.blue
+                        : COLORS.grey,
+                      color: COLORS.white,
                       cursor: isValid ? "pointer" : "not-allowed",
-                      opacity: isValid ? 1 : 0.7,
+                      opacity: isValid ? 1 : 0.6,
                     }}
                     disabled={!isValid}
                     onClick={() => onSave(formData)}

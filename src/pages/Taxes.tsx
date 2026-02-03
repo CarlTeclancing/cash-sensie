@@ -3,7 +3,7 @@ import PageTitle from "../components/ui/PageTitle";
 import { useWindowSize } from "../hooks/useWindowSize";
 import { MOBILE_SIZE, COLORS, DARK_MODE_COLORS } from "../constants/constants";
 import TaxTable from "../components/ui/TaxTable";
-import TaxFormModal, {type TaxFormData } from "../components/ui/TaxFormModal";
+import TaxFormModal, { type TaxFormData } from "../components/ui/TaxFormModal";
 import { useAppStore } from "../store/store";
 
 type TaxRow = {
