@@ -37,7 +37,7 @@ const Sidebar = () => {
     location.toLowerCase() === firstLocation.toLowerCase();
   return (
     <div
-      className="w-full py-4   fixed bottom-0 left-0 md:bottom-auto md:top-0  md:w-1/5 flex items-center justify-center md:justify-between h-1/9 md:h-screen flex-row md:flex-col rounded-t-3xl px-10 md:px-0 md:rounded-t-none z-50"
+      className="w-full py-4   fixed bottom-0 left-0 md:bottom-auto md:top-0  md:w-1/5 flex items-center justify-center md:justify-between h-1/9 md:h-screen flex-row md:flex-col rounded-t-3xl px-0.5 md:px-0 md:rounded-t-none z-50"
       style={{
         backgroundColor: `${isDarkMode ? (width < MOBILE_SIZE ? DARK_MODE_COLORS.darkBlue : DARK_MODE_COLORS.darkBlue) : width < MOBILE_SIZE ? COLORS.white : COLORS.white}`,
         borderTop: `${width < MOBILE_SIZE ? `1px solid ${COLORS.green}` : ``} `,
@@ -46,7 +46,7 @@ const Sidebar = () => {
       {width < MOBILE_SIZE ? (
         <>
           <div
-            className="absolute top-0 left-1/2 w-11 h-11 rounded-lg flex items-center justify-center -translate-x-1/2 -translate-y-1/2 z-10
+            className="absolute top-0 left-1/2 w-11 h-11 rounded-lg flex items-center ml-2 justify-center -translate-x-1/2 -translate-y-1/2 z-10
              shadow-lg shadow-black/50" // "Normal" deep shadow
             style={{
               backgroundColor: isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue,
@@ -55,35 +55,44 @@ const Sidebar = () => {
           >
             <img src={plusIcon} alt="" className="w-5 h-5" />
           </div>
-          <div className="flex items-center justify-between w-full">
-            <div className="flex gap-7">
-              <MobileMenuButton
-                content="Home"
-                isActive={isActive("dashboard")}
-                icon={dashbIcon}
-                iconActive={dashboardIconRed}
-              />
-              <MobileMenuButton
-                content="Transactions"
-                isActive={isActive("transactions")}
-                icon={transactions}
-                iconActive={transactionsRedIcon}
-              />
-            </div>
-            <div className="flex gap-7">
-              <MobileMenuButton
-                content="Savings"
-                isActive={isActive("savings")}
-                icon={savings}
-                iconActive={savingsRedIcon}
-              />
-              <MobileMenuButton
-                content="Debits"
-                isActive={isActive("debits")}
-                icon={debits}
-                iconActive={debitsRedIcon}
-              />
-            </div>
+          <div className="flex items-center justify-evenly w-full">
+            <MobileMenuButton
+              content="Home"
+              isActive={isActive("dashboard")}
+              icon={dashbIcon}
+              iconActive={dashboardIconRed}
+            />
+            <MobileMenuButton
+              content="Transactions"
+              isActive={isActive("transactions")}
+              icon={transactions}
+              iconActive={transactionsRedIcon}
+            />
+            <MobileMenuButton
+              content="Notes"
+              isActive={isActive("notes")}
+              icon={activities}
+              iconActive={activitiesFocus}
+            />
+            <div className="w-8"></div>
+            <MobileMenuButton
+              content="Taxes"
+              isActive={isActive("taxes")}
+              icon={taxes}
+              iconActive={taxesFocus}
+            />
+            <MobileMenuButton
+              content="Savings"
+              isActive={isActive("savings")}
+              icon={savings}
+              iconActive={savingsRedIcon}
+            />
+            <MobileMenuButton
+              content="Debits"
+              isActive={isActive("debits")}
+              icon={debits}
+              iconActive={debitsRedIcon}
+            />
           </div>
         </>
       ) : (
@@ -119,8 +128,8 @@ const Sidebar = () => {
               iconActive={debitsFocus}
             />
             <MenuButton
-              content="Activities"
-              isActive={isActive("activities")}
+              content="Notes"
+              isActive={isActive("notes")}
               icon={activities}
               iconActive={activitiesFocus}
             />

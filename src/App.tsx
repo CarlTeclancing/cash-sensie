@@ -1,4 +1,4 @@
-import  { useEffect } from "react";
+import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Tests from "./pages/Tests";
 import Register from "./pages/Register";
@@ -11,12 +11,14 @@ import Layout from "./components/layout/Layout";
 import Transactions from "./pages/Transactions";
 import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
+import Taxes from "./pages/Taxes";
+import Notes from "./pages/Notes";
 
 const App = () => {
   const { width } = useWindowSize();
-  const { isDarkMode, toggleDarkMode } = useAppStore();
+  const { isDarkMode } = useAppStore();
   useEffect(() => {
-    document.querySelector  ("body")!.style.backgroundColor =
+    document.querySelector("body")!.style.backgroundColor =
       `${isDarkMode ? (width < 768 ? DARK_MODE_COLORS.darkBlue : DARK_MODE_COLORS.background) : width < 768 ? COLORS.white : COLORS.background}`;
   });
   return (
@@ -35,7 +37,9 @@ const App = () => {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/savings" element={<h1>Savings</h1>} />
             <Route path="/debits" element={<h1>Debits</h1>} />
-            <Route path="/settings" element={<Settings />}  />
+            <Route path="/taxes" element={<Taxes />} />
+            <Route path="/notes" element={<Notes />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

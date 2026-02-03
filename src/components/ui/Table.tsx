@@ -1,9 +1,11 @@
-import React from "react";
+import { useState } from "react";
 import TableRow from "./TableRow";
 import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
 import { useAppStore } from "../../store/store";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { MOBILE_SIZE } from "../../constants/constants";
+import TransactionFormModal from "./TransactionFormModal";
+import type { TransactionFormData } from "./TransactionFormModal";
 
 const tableData: Array<{
   id: string;
@@ -43,6 +45,47 @@ const Table = () => {
   const { isDarkMode } = useAppStore();
   const windowSize = useWindowSize();
   const isMobile = windowSize.width <= MOBILE_SIZE;
+  const [rows, setRows] = useState(tableData);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingRow, setEditingRow] = useState<TransactionFormData | null>(
+    null,
+  );
+
+  const handleEdit = (id: string) => {
+    const row = rows.find((item) => item.id === id);
+    if (row) {
+      setEditingRow({
+        id: row.id,
+        title: row.title,
+        date: row.date,
+        type: row.type,
+        amount: row.amount,
+      });
+      setIsEditOpen(true);
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    setRows((prev) => prev.filter((row) => row.id !== id));
+  };
+
+  const handleSave = (data: TransactionFormData) => {
+    setRows((prev) =>
+      prev.map((row) =>
+        row.id === data.id
+          ? {
+              ...row,
+              title: data.title,
+              date: data.date,
+              type: data.type,
+              amount: data.amount,
+            }
+          : row,
+      ),
+    );
+    setIsEditOpen(false);
+    setEditingRow(null);
+  };
 
   return (
     <div className="md:w-full w-11/12 flex items-center justify-center ">
@@ -121,11 +164,33 @@ const Table = () => {
                 : COLORS.white,
           }}
         >
-          {tableData.map((row) => (
-            <TableRow key={row.id} {...row} />
-          ))}
+          {rows.length === 0 ? (
+            <div className="text-center py-6" style={{ color: COLORS.grey }}>
+              No transactions
+            </div>
+          ) : (
+            rows.map((row, index) => (
+              <TableRow
+                key={row.id}
+                {...row}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                isLast={index === rows.length - 1}
+              />
+            ))
+          )}
         </div>
       </div>
+      <TransactionFormModal
+        isOpen={isEditOpen}
+        mode="edit"
+        initialData={editingRow}
+        onClose={() => {
+          setIsEditOpen(false);
+          setEditingRow(null);
+        }}
+        onSave={handleSave}
+      />
     </div>
   );
 };

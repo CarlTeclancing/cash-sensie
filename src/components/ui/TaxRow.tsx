@@ -1,26 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
 import { useAppStore } from "../../store/store";
-import ArrowUpIcon from "../../assets/arrow-up.png";
-import ArrowDownIcon from "../../assets/arrow-down.png";
 import ActionIcon from "../../assets/action-icon.png";
 import ActionIconDark from "../../assets/action-icon-darkmode.png";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { MOBILE_SIZE } from "../../constants/constants";
 
-type props = {
+export type TaxRowData = {
   id: string;
-  icon: React.ReactNode;
   title: string;
-  date: string;
-  type: "Debit" | "Saving";
+  description: string;
   amount: string;
+  recurring: boolean;
+};
+
+type TaxRowProps = TaxRowData & {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   isLast?: boolean;
 };
 
-const TableRow = (props: props) => {
+const TaxRow = ({
+  id,
+  title,
+  description,
+  amount,
+  recurring,
+  onEdit,
+  onDelete,
+  isLast,
+}: TaxRowProps) => {
   const { isDarkMode } = useAppStore();
   const isMobile = useWindowSize().width <= MOBILE_SIZE;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -41,76 +50,40 @@ const TableRow = (props: props) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [menuOpen]);
+
   return (
     <div
-      className="w-full flex items-center  py-3 px-2 text-sm cursor-pointer"
+      className="w-full flex items-center py-3 px-2 text-sm cursor-pointer"
       onClick={() => isMobile && setMenuOpen((prev) => !prev)}
     >
-      <div className="w-1/6 md:w-1/12 flex justify-center">
-        <div
-          className="rounded-full p-1 items-center justify-center flex"
-          style={{
-            backgroundColor: isDarkMode ? COLORS.white : COLORS.background,
-          }}
-        >
-          {props.icon}
-        </div>
-      </div>
-      <div className="w-3/6 md:w-3/12 items-center flex justify-center">
-        <span
-          className={`font-semibold ${isDarkMode ? "text-white" : "text-black"}`}
-        >
-          {props.title}
-        </span>
-      </div>
-
-      <div className="w-0  md:w-1/6 items-center justify-center hidden md:flex">
-        <span
-          style={{
-            color: COLORS.grey,
-          }}
-        >
-          {props.date}
-        </span>
-      </div>
-
-      <div className="w-1/3 md:w-1/6 items-center justify-center  gap-1 flex">
-        <span
-          className={`font-semibold ${isDarkMode ? "text-white" : "text-black"}`}
-          style={{
-            color: `${isMobile ? (props.type.toLocaleLowerCase() === "debit" ? COLORS.red : COLORS.green) : isDarkMode ? COLORS.white : COLORS.black}`,
-          }}
-        >
-          {props.type.toLowerCase() === "debit"
-            ? `${props.amount}`
-            : `${props.amount}`}
-        </span>
-        {!isMobile &&
-          (props.type.toLowerCase() === "debit" ? (
-            <div className="flex items-center ">
-              <img src={ArrowUpIcon} alt="arrow up" className="w-3 h-6 ml-3" />
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <img src={ArrowDownIcon} alt="arrow down" className="w-6 h-6" />
-            </div>
-          ))}
-      </div>
-      <div className="w-0 md:w-1/6 items-center justify-center  hidden md:flex">
+      <div className="w-4/12 md:w-3/12 flex justify-start">
         <span
           className="font-semibold"
-          style={{
-            color:
-              props.type.toLowerCase() === "debit" ? COLORS.red : COLORS.green,
-          }}
+          style={{ color: isDarkMode ? COLORS.white : COLORS.black }}
         >
-          {props.type}
+          {title}
         </span>
       </div>
-      <div
-        className="w-0 md:w-1/6 flex items-center justify-center relative"
-        ref={menuRef}
-      >
+      <div className="w-0 md:w-4/12 hidden md:flex justify-start">
+        <span style={{ color: COLORS.grey }}>{description}</span>
+      </div>
+      <div className="w-4/12 md:w-2/12 flex justify-center">
+        <span
+          className="font-semibold"
+          style={{ color: isDarkMode ? COLORS.white : COLORS.black }}
+        >
+          {amount}
+        </span>
+      </div>
+      <div className="w-4/12 md:w-2/12 flex justify-center">
+        <span
+          className="font-semibold"
+          style={{ color: recurring ? COLORS.green : COLORS.red }}
+        >
+          {recurring ? "Yes" : "No"}
+        </span>
+      </div>
+      <div className="w-0 md:w-1/12 flex justify-center relative" ref={menuRef}>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -121,7 +94,7 @@ const TableRow = (props: props) => {
           <img
             src={isDarkMode ? ActionIconDark : ActionIcon}
             alt="action icon"
-            className="w-8 h-8"
+            className="w-7 h-7"
           />
         </button>
         {menuOpen && (
@@ -139,7 +112,7 @@ const TableRow = (props: props) => {
               className={`absolute rounded-xl shadow-xl z-50 ${
                 isMobile
                   ? "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 fixed w-64 p-6"
-                  : props.isLast
+                  : isLast
                     ? "right-0 bottom-full mb-2 w-32"
                     : "right-0 mt-2 w-32"
               }`}
@@ -177,7 +150,7 @@ const TableRow = (props: props) => {
                 }}
                 onClick={() => {
                   setMenuOpen(false);
-                  props.onEdit?.(props.id);
+                  onEdit?.(id);
                 }}
               >
                 Edit
@@ -196,7 +169,7 @@ const TableRow = (props: props) => {
                 }}
                 onClick={() => {
                   setMenuOpen(false);
-                  props.onDelete?.(props.id);
+                  onDelete?.(id);
                 }}
               >
                 Delete
@@ -209,4 +182,4 @@ const TableRow = (props: props) => {
   );
 };
 
-export default TableRow;
+export default TaxRow;
