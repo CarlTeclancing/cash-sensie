@@ -13,6 +13,8 @@ import Dashboard from "./pages/Dashboard";
 import Settings from "./pages/Settings";
 import Taxes from "./pages/Taxes";
 import Notes from "./pages/Notes";
+import Savings from "./pages/Savings";
+import Debits from "./pages/Debits";
 
 const App = () => {
   const { width } = useWindowSize();
@@ -35,8 +37,8 @@ const App = () => {
             <Route path="/tests" element={<Tests />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/transactions" element={<Transactions />} />
-            <Route path="/savings" element={<h1>Savings</h1>} />
-            <Route path="/debits" element={<h1>Debits</h1>} />
+            <Route path="/savings" element={<Savings/>} />
+            <Route path="/debits" element={<Debits/>} />
             <Route path="/taxes" element={<Taxes />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/settings" element={<Settings />} />
