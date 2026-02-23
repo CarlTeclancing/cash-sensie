@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--autofill-color) !important;
+}
+
+/* Hide scrollbar but keep scrolling functionality */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
