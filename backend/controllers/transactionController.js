@@ -1,16 +1,14 @@
-import transactionModel from "../model/transactionModel";
-import userModel from "../model/userModel";
+import transactionModel from "../model/transactionModel.js";
+import userModel from "../model/userModel.js";
 
 const addTransaction = async (req, res) => {
   try {
-    const { title, amount, type, category, description } = req.body;
-    const userId = req.userId; // Get user ID from authenticated request
-
-    // Validate required fields
+    const { title, amount, type, category,note } = req.body;
+    const userId = req.userId; 
     if (!title || !amount || !type || !category) {
       return res.status(400).json({
         success: false,
-        message: "All fields except description are required",
+        message: "All fields except note are required",
       });
     }
     const newTransaction = new transactionModel({
@@ -19,7 +17,7 @@ const addTransaction = async (req, res) => {
       amount,
       type,
       category,
-      description,
+      note,
     });
     await newTransaction.save();
     res.status(201).json({
@@ -33,10 +31,10 @@ const addTransaction = async (req, res) => {
       success: false,
       message: error.message,
     });
-  }
+  }}
   const getTransactions = async (req, res) => {
     try {
-      const userId = req.userId; // Get user ID from authenticated request  
+      const userId = req.userId;  
       const transactions = await transactionModel.find({ userId });
         res.json({
           success: true,
@@ -50,11 +48,58 @@ const addTransaction = async (req, res) => {
       });
     }
   };
-  
+  const getTransactionById = async (req, res) => {
+    try { 
+        const { id } = req.params;  
+        const userId = req.userId; // Get user ID from authenticated request
+        const transaction = await transactionModel.findOne({ _id: id, userId });
+        if (!transaction) {
+          return res.status(404).json({
+            success: false,
+            message: "Transaction not found",
+          });
+        }
+        res.json({
+          success: true,
+          transaction,
+        });
+    }
+        catch (error) {
+            console.error("Get transaction by ID error:", error);
+            res.status(500).json({
+              success: false,
+              message: error.message,
+            });
+          }
+  }
+const deleteTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+        const transaction = await transactionModel.findOneAndDelete({ _id: id, userId });
+        if (!transaction) {
+          return res.status(404).json({
+            success: false,
+            message: "Transaction not found",
+          });
+        }
+        res.json({
+          success: true,
+          message: "Transaction deleted successfully",
+        });
+    }
+        catch (error) {
+            console.error("Delete transaction error:", error);
+            res.status(500).json({
+              success: false,
+                message: error.message,
+            });
+          }
+    };
  const editTransaction = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, amount, type, category, description } = req.body;
+    const { title, amount, type, category, note } = req.body;
     const userId = req.userId; // Get user ID from authenticated request
     const transaction = await transactionModel.findOne({ _id: id, userId });
     if (!transaction) {
@@ -68,7 +113,7 @@ const addTransaction = async (req, res) => {
     if (amount) transaction.amount = amount;
     if (type) transaction.type = type;
     if (category) transaction.category = category;
-    if (description) transaction.description = description;
+    if (note) transaction.note = note;
     await transaction.save();
     res.json({
       success: true,
@@ -83,6 +128,6 @@ const addTransaction = async (req, res) => {
           message: error.message,
         });
       }
-  }; 
-};
-export { addTransaction, getTransactions,editTransaction };
+  };
+
+export {addTransaction, getTransactions,editTransaction,getTransactionById,deleteTransaction };

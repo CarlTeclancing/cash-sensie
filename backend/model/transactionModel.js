@@ -27,8 +27,9 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    description:{
+    note:{
         type: String,
     }
 })
-export default mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema) 
+const transactionModel = mongoose.models.Transaction || mongoose.model('Transaction', transactionSchema)
+export default transactionModel

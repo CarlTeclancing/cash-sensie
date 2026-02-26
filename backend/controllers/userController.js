@@ -36,53 +36,7 @@ const validatePassword = (password) => {
   return { valid: true };
 };
 
-// Route for user login
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
 
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
-
-    const user = await userModel.findOne({ email });
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "User doesn't exist",
-      });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
-
-    const token = createToken(user._id);
-    res.json({
-      success: true,
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
 
 // Route for user registration
 const registerUser = async (req, res) => {
@@ -153,7 +107,53 @@ const registerUser = async (req, res) => {
     });
   }
 };
+// Route for user login
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User doesn't exist",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const token = createToken(user._id);
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 // Get user profile (protected route)
 const getUserProfile = async (req, res) => {
   try {
