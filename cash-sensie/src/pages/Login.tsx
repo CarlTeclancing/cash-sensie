@@ -3,7 +3,8 @@ import logo from "../assets/logo.svg";
 import darkModeLogo from "../assets/dark-logo.png";
 import { COLORS, DARK_MODE_COLORS } from "../constants/constants";
 import LoginPageInputs from "../components/ui/LoginPageInputs";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import axios from "axios";
 import LineWithText from "../components/ui/LineWithText";
 import LoginPageButton from "../components/ui/LoginPageButton";
 import { useRef, useState } from "react";
@@ -18,6 +19,7 @@ type errors = {
 };
 
 const Login = ({ isDarkMode }: props) => {
+  const navigate = useNavigate();
   const [errors, setErrors] = useState<errors>({
     email: "",
     password: "",
@@ -47,7 +49,7 @@ const Login = ({ isDarkMode }: props) => {
     return "";
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     if (!email) {
       setErrors((prev) => ({
         ...prev,
@@ -69,7 +71,27 @@ const Login = ({ isDarkMode }: props) => {
       errors.password && passwordRef.current?.focus();
       return;
     }
-    //FORM SUBMISSION LOGIC HERE
+  
+    try {
+      const response = await axios.post("http://localhost:4000/api/user/login", {
+        email,
+        password,
+      });
+
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/");
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Login failed";
+      
+      // If error relates to password or credentials, show under password field
+      if (message.toLowerCase().includes("password") || message.toLowerCase().includes("credentials")) {
+        setErrors((prev) => ({ ...prev, password: message }));
+      } else {
+        setErrors((prev) => ({ ...prev, email: message }));
+      }
+    }
   };
 
   return (
@@ -107,7 +129,7 @@ const Login = ({ isDarkMode }: props) => {
                 onBlur={(e) => {
                   setErrors((prev) => ({
                     ...prev,
-                    name: checkValidity(e, "name"),
+                    email: checkValidity(e, "email"),
                   }));
                 }}
                 onChange={(el) => {

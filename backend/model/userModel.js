@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+   
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -20,7 +21,25 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
       select: false,
     },
+
+    profile: {
+      address: { type: String }, 
+      occupation: { type: String }, 
+      dob: { type: Date }, 
+      avatar: { type: String },
+      bio: { type: String, maxlength: 500 },
+      phone: { type: String },
+    },
+
     settings: {
+      currencies: [
+        {
+          type: String, 
+        },
+      ],
+      heardAbout: {
+        type: String, 
+      },
       theme: {
         type: String,
         enum: ["light", "dark", "auto"],
@@ -39,11 +58,7 @@ const userSchema = new mongoose.Schema(
         default: "UTC",
       },
     },
-    profile: {
-      avatar: { type: String },
-      bio: { type: String, maxlength: 500 },
-      phone: { type: String },
-    },
+
     isActive: {
       type: Boolean,
       default: true,
@@ -54,7 +69,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const userModel = mongoose.models.User || mongoose.model("User", userSchema);

@@ -6,7 +6,9 @@ import userModel from "../model/userModel.js";
 // Create JWT Token
 const createToken = (id) => {
   if (!process.env.JWT_SECRET) {
-    console.error("FATAL ERROR: JWT_SECRET is not defined in environment variables.");
+    console.error(
+      "FATAL ERROR: JWT_SECRET is not defined in environment variables.",
+    );
   }
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
@@ -51,7 +53,16 @@ const validatePassword = (password) => {
 // Route for user registration
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const {
+      name,
+      email,
+      password,
+      address,
+      occupation,
+      dob,
+      currencies,
+      heardAbout,
+    } = req.body;
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -95,6 +106,15 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      profile: {
+        address,
+        occupation,
+        dob,
+      },
+      settings: {
+        currencies,
+        heardAbout,
+      },
     });
     const user = await newUser.save();
 
@@ -138,7 +158,11 @@ const loginUser = async (req, res) => {
       });
     }
 
-    console.log("Login Debug:", { passwordInput: !!password, userFound: !!user, hasPasswordHash: !!user.password });
+    console.log("Login Debug:", {
+      passwordInput: !!password,
+      userFound: !!user,
+      hasPasswordHash: !!user.password,
+    });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -199,7 +223,7 @@ const getUserProfile = async (req, res) => {
 // Update user profile/settings (protected route)
 const updateUserProfile = async (req, res) => {
   try {
-    const { name, email, settings } = req.body;
+    const { name, email, settings, profile } = req.body;
 
     // Find user
     const user = await userModel.findById(req.userId);
@@ -241,6 +265,16 @@ const updateUserProfile = async (req, res) => {
       user.settings = { ...user.settings, ...settings };
     }
 
+    // Update profile if provided
+    if (profile && typeof profile === "object") {
+      if (profile.address) user.profile.address = profile.address;
+      if (profile.occupation) user.profile.occupation = profile.occupation;
+      if (profile.dob) user.profile.dob = profile.dob;
+      if (profile.avatar) user.profile.avatar = profile.avatar;
+      if (profile.bio) user.profile.bio = profile.bio;
+      if (profile.phone) user.profile.phone = profile.phone;
+    }
+
     await user.save();
 
     res.json({
@@ -251,6 +285,7 @@ const updateUserProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         settings: user.settings || {},
+        profile: user.profile || {},
       },
     });
   } catch (error) {
