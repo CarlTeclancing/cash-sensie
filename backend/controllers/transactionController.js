@@ -3,8 +3,8 @@ import userModel from "../model/userModel.js";
 
 const addTransaction = async (req, res) => {
   try {
-    const { title, amount, type, category,note } = req.body;
-    const userId = req.userId; 
+    const { title, amount, type, category, note } = req.body;
+    const userId = req.userId;
     if (!title || !amount || !type || !category) {
       return res.status(400).json({
         success: false,
@@ -31,72 +31,74 @@ const addTransaction = async (req, res) => {
       success: false,
       message: error.message,
     });
-  }}
-  const getTransactions = async (req, res) => {
-    try {
-      const userId = req.userId;  
-      const transactions = await transactionModel.find({ userId });
-        res.json({
-          success: true,
-          transactions,
-        });
-    } catch (error) {
-      console.error("Get transactions error:", error);
-      res.status(500).json({
+  }
+};
+const getTransactions = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const transactions = await transactionModel.find({ userId });
+    res.json({
+      success: true,
+      transactions,
+    });
+  } catch (error) {
+    console.error("Get transactions error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+const getTransactionById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId; // Get user ID from authenticated request
+    const transaction = await transactionModel.findOne({ _id: id, userId });
+    if (!transaction) {
+      return res.status(404).json({
         success: false,
-        message: error.message,
+        message: "Transaction not found",
       });
     }
-  };
-  const getTransactionById = async (req, res) => {
-    try { 
-        const { id } = req.params;  
-        const userId = req.userId; // Get user ID from authenticated request
-        const transaction = await transactionModel.findOne({ _id: id, userId });
-        if (!transaction) {
-          return res.status(404).json({
-            success: false,
-            message: "Transaction not found",
-          });
-        }
-        res.json({
-          success: true,
-          transaction,
-        });
-    }
-        catch (error) {
-            console.error("Get transaction by ID error:", error);
-            res.status(500).json({
-              success: false,
-              message: error.message,
-            });
-          }
+    res.json({
+      success: true,
+      transaction,
+    });
+  } catch (error) {
+    console.error("Get transaction by ID error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
+};
 const deleteTransaction = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const userId = req.userId;
-        const transaction = await transactionModel.findOneAndDelete({ _id: id, userId });
-        if (!transaction) {
-          return res.status(404).json({
-            success: false,
-            message: "Transaction not found",
-          });
-        }
-        res.json({
-          success: true,
-          message: "Transaction deleted successfully",
-        });
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+    const transaction = await transactionModel.findOneAndDelete({
+      _id: id,
+      userId,
+    });
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        message: "Transaction not found",
+      });
     }
-        catch (error) {
-            console.error("Delete transaction error:", error);
-            res.status(500).json({
-              success: false,
-                message: error.message,
-            });
-          }
-    };
- const editTransaction = async (req, res) => {
+    res.json({
+      success: true,
+      message: "Transaction deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete transaction error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+const editTransaction = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, amount, type, category, note } = req.body;
@@ -120,14 +122,19 @@ const deleteTransaction = async (req, res) => {
       message: "Transaction updated successfully",
       transaction,
     });
+  } catch (error) {
+    console.error("Edit transaction error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
-    catch (error) {
-        console.error("Edit transaction error:", error);
-        res.status(500).json({
-          success: false,
-          message: error.message,
-        });
-      }
-  };
+};
 
-export {addTransaction, getTransactions,editTransaction,getTransactionById,deleteTransaction };
+export {
+  addTransaction,
+  getTransactions,
+  editTransaction,
+  getTransactionById,
+  deleteTransaction,
+};

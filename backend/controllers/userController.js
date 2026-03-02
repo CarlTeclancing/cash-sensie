@@ -5,6 +5,9 @@ import userModel from "../model/userModel.js";
 
 // Create JWT Token
 const createToken = (id) => {
+  if (!process.env.JWT_SECRET) {
+    console.error("FATAL ERROR: JWT_SECRET is not defined in environment variables.");
+  }
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
@@ -17,26 +20,33 @@ const validatePassword = (password) => {
   const hasLowerCase = /[a-z]/.test(password);
   const hasNumbers = /\d/.test(password);
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
+
   if (password.length < minLength) {
     return { valid: false, message: "Password must be at least 8 characters" };
   }
   if (!hasUpperCase) {
-    return { valid: false, message: "Password must contain an uppercase letter" };
+    return {
+      valid: false,
+      message: "Password must contain an uppercase letter",
+    };
   }
   if (!hasLowerCase) {
-    return { valid: false, message: "Password must contain a lowercase letter" };
+    return {
+      valid: false,
+      message: "Password must contain a lowercase letter",
+    };
   }
   if (!hasNumbers) {
     return { valid: false, message: "Password must contain a number" };
   }
   if (!hasSpecialChar) {
-    return { valid: false, message: "Password must contain a special character" };
+    return {
+      valid: false,
+      message: "Password must contain a special character",
+    };
   }
   return { valid: true };
 };
-
-
 
 // Route for user registration
 const registerUser = async (req, res) => {
@@ -120,7 +130,7 @@ const loginUser = async (req, res) => {
       });
     }
 
-    const user = await userModel.findOne({ email });
+    const user = await userModel.findOne({ email }).select("+password");
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -128,6 +138,7 @@ const loginUser = async (req, res) => {
       });
     }
 
+    console.log("Login Debug:", { passwordInput: !!password, userFound: !!user, hasPasswordHash: !!user.password });
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -158,7 +169,7 @@ const loginUser = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const user = await userModel.findById(req.userId).select("-password");
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -189,10 +200,10 @@ const getUserProfile = async (req, res) => {
 const updateUserProfile = async (req, res) => {
   try {
     const { name, email, settings } = req.body;
-    
+
     // Find user
     const user = await userModel.findById(req.userId);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -208,7 +219,7 @@ const updateUserProfile = async (req, res) => {
           message: "Please enter a valid email",
         });
       }
-      
+
       // Check if new email is already taken
       const emailExists = await userModel.findOne({ email });
       if (emailExists) {
@@ -263,8 +274,8 @@ const changePassword = async (req, res) => {
       });
     }
 
-    const user = await userModel.findById(req.userId);
-    
+    const user = await userModel.findById(req.userId).select("+password");
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -308,4 +319,10 @@ const changePassword = async (req, res) => {
   }
 };
 
-export { loginUser, registerUser, getUserProfile, updateUserProfile, changePassword };
+export {
+  loginUser,
+  registerUser,
+  getUserProfile,
+  updateUserProfile,
+  changePassword,
+};
