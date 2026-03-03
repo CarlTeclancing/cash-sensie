@@ -9,58 +9,15 @@ import RegisterPage2 from "../components/ui/RegisterPage2";
 import RegisterPage3 from "../components/ui/RegisterPage3";
 import RegisterFinalPage from "../components/ui/RegisterFinalPage";
 import { useAppStore } from "../store/store";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-type RegisterProps = {
+type props = {
   isDarkMode: boolean;
 };
 
-const Register = ({ isDarkMode }: RegisterProps) => {
-  const {
-    currentRegisterPage,
-    name,
-    email,
-    password,
-    address,
-    occupation,
-    dob,
-    currencies,
-    heardAbout,
-  } = useAppStore();
-  const navigate = useNavigate();
-
-  const handleRegistration = async () => {
-    // You can add logic here to display errors to the user,
-    // perhaps by setting an error state in your store.
-    try {
-      const response = await axios.post<{ success: boolean; token: string; message?: string }>(
-        "http://localhost:4000/api/user/register",
-        {
-          name,
-          email,
-          password,
-          address,
-          occupation,
-          dob,
-          currencies,
-          heardAbout,
-        },
-      );
-
-      if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        navigate("/"); // Redirect to the main app page on success
-      }
-    } catch (error: any) {
-      console.error(
-        "Registration failed:",
-        error.response?.data?.message || error.message,
-      );
-      // TODO: Set an error state in your store to show the user.
-    }
-  };
-
+const Register = ({ isDarkMode }: props) => {
+  const { currentRegisterPage } = useAppStore();
+  // logic to register
+  
   return (
     <div className="w-screen h-screen flex  overflow-hidden">
       <div
@@ -85,10 +42,7 @@ const Register = ({ isDarkMode }: RegisterProps) => {
             <RegisterPage3 isDarkMode={isDarkMode} />
           )}
           {currentRegisterPage === 4 && (
-            <RegisterFinalPage
-              isDarkMode={isDarkMode}
-              onRegister={handleRegistration}
-            />
+            <RegisterFinalPage isDarkMode={isDarkMode} />
           )}
         </div>
       </div>
