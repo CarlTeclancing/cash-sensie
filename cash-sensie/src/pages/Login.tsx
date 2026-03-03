@@ -8,7 +8,7 @@ import axios from "axios";
 import LineWithText from "../components/ui/LineWithText";
 import LoginPageButton from "../components/ui/LoginPageButton";
 import { useRef, useState } from "react";
-
+import { useAppStore } from "../store/store";
 type props = {
   isDarkMode: boolean;
 };
@@ -80,6 +80,15 @@ const Login = ({ isDarkMode }: props) => {
 
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userId", response.data.user.id);
+
+        useAppStore.setState({
+        userId: response.data.user.id,
+        userToken: response.data.token,
+        userLoggedIn: true
+      });
+
+      useAppStore.getState().fetchTransactions();
         navigate("/");
       }
     } catch (error: any) {

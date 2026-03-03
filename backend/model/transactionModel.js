@@ -9,6 +9,10 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    emoji:{
+        type: String,
+        required: false,
+    },
    date:{
         type: Date,
         default: Date.now,
@@ -16,11 +20,6 @@ const transactionSchema = new mongoose.Schema({
     },
     amount:{
         type: Number,
-        required: true,
-    },
-    type:{
-        type: String,
-        enum: ['income', 'expense'],
         required: true,
     },
     category:{

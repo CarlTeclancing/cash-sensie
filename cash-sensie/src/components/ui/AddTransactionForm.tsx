@@ -7,7 +7,7 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import { MOBILE_SIZE } from "../../constants/constants";
 import leftArrow from "../../assets/left-arrow.png";
 import "emoji-picker-element";
-
+import axios from "axios"
 type TransactionData = {
   title: string;
   emoji: string;
@@ -22,6 +22,7 @@ const AddTransactionForm = () => {
     isAddtransactionsFormVisible,
     isDarkMode,
     toggleAddTransactionsForm,
+    addTransaction,
   } = useAppStore();
   const { width, height } = useWindowSize();
   const [transactionData, setTransactionData] = useState<TransactionData>({
@@ -32,6 +33,41 @@ const AddTransactionForm = () => {
     date: "",
     note: "",
   });
+
+  const submitHandler=async()=>{
+   try {
+      const today = new Date().toISOString().split('T')[0];
+
+      await addTransaction({
+        title: transactionData.title,
+        emoji: transactionData.emoji,
+        amount: transactionData.amount,
+        type: transactionData.category,
+        category: transactionData.category,
+        date: today,
+        note: transactionData.note || "",
+      });
+      
+      // Reset form
+      setTransactionData({
+        title: "",
+        emoji: "",
+        amount: 0,
+        category: "",
+        date: "",
+        note: "",
+      });
+      
+    } catch (error) {
+      console.error("Failed to save transaction:", error);
+      alert("Failed to save transaction");
+    }
+  }
+
+    const isValid = transactionData.title &&
+                 transactionData.amount > 0 && 
+                transactionData.emoji &&      
+                transactionData.category;; 
 
   return (
     <AnimatePresence>
@@ -185,6 +221,8 @@ const AddTransactionForm = () => {
                   style={{
                     backgroundColor: `${isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue}`,
                   }}
+                  disabled={!isValid}
+                  onClick={submitHandler}
                 >
                   Create Transaction
                 </button>

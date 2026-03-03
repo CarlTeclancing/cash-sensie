@@ -3,7 +3,7 @@ import userModel from "../model/userModel.js";
 
 const addTransaction = async (req, res) => {
   try {
-    const { title, amount, type, category, note } = req.body;
+    const { title, emoji, amount, type, category, note } = req.body;
     const userId = req.userId;
     if (!title || !amount || !type || !category) {
       return res.status(400).json({
@@ -14,8 +14,8 @@ const addTransaction = async (req, res) => {
     const newTransaction = new transactionModel({
       userId,
       title,
+      emoji,
       amount,
-      type,
       category,
       note,
     });
