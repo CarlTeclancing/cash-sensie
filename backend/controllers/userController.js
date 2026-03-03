@@ -59,7 +59,7 @@ const registerUser = async (req, res) => {
       password,
       address,
       occupation,
-      dob,
+      dateOfBirth,
       currencies,
       heardAbout,
     } = req.body;
@@ -109,7 +109,7 @@ const registerUser = async (req, res) => {
       profile: {
         address,
         occupation,
-        dob,
+        dateOfBirth,
       },
       settings: {
         currencies,
@@ -269,7 +269,7 @@ const updateUserProfile = async (req, res) => {
     if (profile && typeof profile === "object") {
       if (profile.address) user.profile.address = profile.address;
       if (profile.occupation) user.profile.occupation = profile.occupation;
-      if (profile.dob) user.profile.dob = profile.dob;
+      if (profile.dateOfBirth) user.profile.dateOfBirth = profile.dateOfBirth;
       if (profile.avatar) user.profile.avatar = profile.avatar;
       if (profile.bio) user.profile.bio = profile.bio;
       if (profile.phone) user.profile.phone = profile.phone;

@@ -8,7 +8,7 @@ interface registrationDataType {
   occupation: string;
   dateOfBirth: string;
   currency: string;
-  aboutUs: string;
+  heardAbout: string;
 }
 
 interface AppState {
@@ -40,7 +40,7 @@ export const useAppStore = create<AppState>((set) => ({
     occupation: "",
     dateOfBirth: "",
     currency: "",
-    aboutUs: "",
+    heardAbout: "",
   },
   changeRegisterPage: (page: number) =>
     set(() => ({

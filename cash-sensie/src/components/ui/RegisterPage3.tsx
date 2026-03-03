@@ -81,10 +81,10 @@ const RegisterPage3 = ({ isDarkMode }: props) => {
           onChange={(e) =>
             updateRegistrationData({
               ...registrationData,
-              aboutUs: e.target.value,
+              heardAbout: e.target.value,
             })
           }
-          value={registrationData.aboutUs}
+          value={registrationData. heardAbout}
         ></textarea>
         <div className="flex mt-2 md:mt-0  items-center">
           <input
