@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageTitle from "../components/ui/PageTitle";
 import NoteCard from "../components/ui/NoteCard";
 import NoteFormModal, {
@@ -7,7 +7,8 @@ import NoteFormModal, {
 import { useWindowSize } from "../hooks/useWindowSize";
 import { MOBILE_SIZE, COLORS, DARK_MODE_COLORS } from "../constants/constants";
 import { useAppStore } from "../store/store";
-import { Plus } from "lucide-react";
+
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 
 type Note = {
   id: string;
@@ -15,27 +16,48 @@ type Note = {
   content: string;
 };
 
+function getToken() {
+  try {
+    return localStorage.getItem("token") || "";
+  } catch {
+    return "";
+  }
+}
+
 const Notes = () => {
   const { width } = useWindowSize();
   const { isDarkMode } = useAppStore();
   const isMobile = width <= MOBILE_SIZE;
-  const [notes, setNotes] = useState<Note[]>([
-    {
-      id: "1",
-      title: "Shopping List",
-      content:
-        "Remember to buy milk, eggs, bread, and some vegetables for dinner. Don't forget to check the pantry before going out.",
-    },
-    {
-      id: "2",
-      title: "Budget Tips",
-      content:
-        "Track all expenses this month. Review subscriptions and cancel unused ones. Set a monthly budget for entertainment.",
-    },
-  ]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit" | "view">("add");
   const [selectedNote, setSelectedNote] = useState<NoteFormData | null>(null);
+
+  const headers = useMemo(() => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${getToken()}`,
+  }), []);
+
+  const fetchNotes = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/notes`, { headers });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || "Failed to fetch");
+      const mapped: Note[] = (json.notes || []).map((n: any) => ({
+        id: n._id,
+        title: n.title,
+        content: n.content,
+      }));
+      setNotes(mapped);
+    } catch (e) {
+      console.error(e);
+      setNotes([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
 
   const handleAddNote = () => {
     setModalMode("add");
@@ -61,34 +83,56 @@ const Notes = () => {
     }
   };
 
-  const handleDeleteNote = (id: string) => {
-    setNotes((prev) => prev.filter((note) => note.id !== id));
+  const handleDeleteNote = async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/notes/${id}`, {
+        method: "DELETE",
+        headers,
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || "Delete failed");
+      setNotes((prev) => prev.filter((note) => note.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleSaveNote = (data: NoteFormData) => {
-    if (modalMode === "add") {
-      const newNote: Note = {
-        id: crypto.randomUUID(),
-        title: data.title,
-        content: data.content,
-      };
-      setNotes((prev) => [newNote, ...prev]);
-    } else if (data.id) {
-      setNotes((prev) =>
-        prev.map((note) =>
-          note.id === data.id
-            ? {
-                ...note,
-                title: data.title,
-                content: data.content,
-              }
-            : note,
-        ),
-      );
-    }
+  const handleSaveNote = async (data: NoteFormData) => {
+    try {
+      if (modalMode === "add") {
+        const res = await fetch(`${API_BASE}/api/notes`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ title: data.title, content: data.content }),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || "Create failed");
+        setNotes((prev) => [
+          { id: json.note._id, title: json.note.title, content: json.note.content },
+          ...prev,
+        ]);
+      } else if (data.id) {
+        const res = await fetch(`${API_BASE}/api/notes/${data.id}`, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({ title: data.title, content: data.content }),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || "Update failed");
+        setNotes((prev) =>
+          prev.map((note) =>
+            note.id === data.id
+              ? { id: json.note._id, title: json.note.title, content: json.note.content }
+              : note,
+          ),
+        );
+      }
 
-    setIsModalOpen(false);
-    setSelectedNote(null);
+      setIsModalOpen(false);
+      setSelectedNote(null);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (

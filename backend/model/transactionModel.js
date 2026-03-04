@@ -13,6 +13,11 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    type:{
+        type: String,
+        enum: ['Debit','Saving'],
+        required: true,
+    },
    date:{
         type: Date,
         default: Date.now,
