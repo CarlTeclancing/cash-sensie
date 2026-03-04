@@ -12,12 +12,11 @@ type vals = {
 const Bar = ({ value, max, content }: vals) => {
   const { isDarkMode } = useAppStore();
   return (
-    <div className="flex flex-col gap-3 items-center justify-center">
+    <div className="flex flex-col gap-3 items-center justify-center h-full">
       <div
-        className=" w-6 rounded-md flex justify-end items-end"
+        className=" w-6 rounded-md flex justify-end items-end flex-1"
         style={{
-          backgroundColor: `${isDarkMode ? COLORS.white : COLORS.background}`,
-          height: `400px`,
+          backgroundColor: `${isDarkMode ? DARK_MODE_COLORS.background : COLORS.background}`,
         }}
       >
         <motion.div

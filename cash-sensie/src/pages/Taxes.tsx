@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import PageTitle from "../components/ui/PageTitle";
 import { useWindowSize } from "../hooks/useWindowSize";
 import { MOBILE_SIZE, COLORS, DARK_MODE_COLORS } from "../constants/constants";
 import TaxTable from "../components/ui/TaxTable";
 import TaxFormModal, { type TaxFormData } from "../components/ui/TaxFormModal";
 import { useAppStore } from "../store/store";
+
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 
 type TaxRow = {
   id: string;
@@ -14,29 +16,55 @@ type TaxRow = {
   recurring: boolean;
 };
 
+function getToken() {
+  try {
+    return localStorage.getItem("token") || "";
+  } catch {
+    return "";
+  }
+}
+
 const Taxes = () => {
   const { width } = useWindowSize();
   const { isDarkMode } = useAppStore();
   const isMobile = width <= MOBILE_SIZE;
-  const [taxes, setTaxes] = useState<TaxRow[]>([
-    {
-      id: "1",
-      title: "Income Tax",
-      description: "Monthly income tax deduction",
-      amount: "$120.00",
-      recurring: true,
-    },
-    {
-      id: "2",
-      title: "Property Tax",
-      description: "Annual property tax",
-      amount: "$450.00",
-      recurring: false,
-    },
-  ]);
+  const [taxes, setTaxes] = useState<TaxRow[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedTax, setSelectedTax] = useState<TaxFormData | null>(null);
+
+  const headers = useMemo(
+    () => ({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    }),
+    [],
+  );
+
+  const fetchTaxes = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/taxes`, { headers });
+      const json = await res.json();
+      if (!json.success)
+        throw new Error(json.message || "Failed to fetch taxes");
+      const mapped: TaxRow[] = (json.taxes || []).map((t: any) => ({
+        id: t._id,
+        title: t.title,
+        description: t.description,
+        amount: `$${Number(t.amount || 0).toFixed(2)}`,
+        recurring: t.recurring,
+      }));
+      setTaxes(mapped);
+    } catch (e) {
+      console.error(e);
+      setTaxes([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchTaxes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAddTax = () => {
     setModalMode("add");
@@ -53,34 +81,46 @@ const Taxes = () => {
     }
   };
 
-  const handleDeleteTax = (id: string) => {
-    setTaxes((prev) => prev.filter((tax) => tax.id !== id));
+  const handleDeleteTax = async (id: string) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/taxes/${id}`, {
+        method: "DELETE",
+        headers,
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Delete failed");
+      setTaxes((prev) => prev.filter((tax) => tax.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleSaveTax = (data: TaxFormData) => {
-    if (modalMode === "add") {
-      const newTax: TaxRow = {
-        id: crypto.randomUUID(),
+  const handleSaveTax = async (data: TaxFormData) => {
+    try {
+      const payload = {
         title: data.title,
         description: data.description,
-        amount: data.amount,
+        amount: Number(String(data.amount).replace(/[^0-9.-]/g, "")),
         recurring: data.recurring,
       };
-      setTaxes((prev) => [newTax, ...prev]);
-    } else if (data.id) {
-      setTaxes((prev) =>
-        prev.map((tax) =>
-          tax.id === data.id
-            ? {
-                ...tax,
-                title: data.title,
-                description: data.description,
-                amount: data.amount,
-                recurring: data.recurring,
-              }
-            : tax,
-        ),
-      );
+
+      const url =
+        modalMode === "edit" && data.id
+          ? `${API_BASE}/api/taxes/${data.id}`
+          : `${API_BASE}/api/taxes`;
+      const method = modalMode === "edit" ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || "Save failed");
+
+      fetchTaxes();
+    } catch (e) {
+      console.error(e);
     }
 
     setIsModalOpen(false);

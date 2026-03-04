@@ -5,17 +5,19 @@ import connectDB from "./config/db.js";
 import userRouter from "./routes/userRoute.js";
 import transactionRouter from "./routes/transactionRoutes.js";
 import noteRouter from "./routes/noteRoutes.js";
+import taxRouter from "./routes/taxRoutes.js";
 //app config
 const app = express();
 const port = process.env.PORT || 4000;
 connectDB();
-// MIDDLEWARES
+
 
 app.use(express.json());
 app.use(cors());
-// api endpoints
+
 app.use("/api/user", userRouter);
 app.use("/api/transaction", transactionRouter);
+app.use("/api/taxes", taxRouter);
 app.use("/api/notes", noteRouter);
 app.get("/", (req, res) => {
   res.send("API working");

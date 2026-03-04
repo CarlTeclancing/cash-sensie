@@ -1,11 +1,12 @@
 import transactionModel from "../model/transactionModel.js";
 import userModel from "../model/userModel.js";
+import mongoose from "mongoose";
 
 const addTransaction = async (req, res) => {
   try {
-    const { title, emoji, amount, type, category, note } = req.body;
+    const { title, emoji, amount, type, category, note, date } = req.body;
     const userId = req.userId;
-    const normalizedType = type === 'Saving' ? 'Saving' : 'Debit';
+    const normalizedType = type === "Saving" ? "Saving" : "Debit";
     if (!title || !amount || !category) {
       return res.status(400).json({
         success: false,
@@ -20,6 +21,7 @@ const addTransaction = async (req, res) => {
       amount,
       category,
       note,
+      date,
     });
     await newTransaction.save();
     res.status(201).json({
@@ -54,7 +56,7 @@ const getTransactions = async (req, res) => {
 const getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.userId; 
+    const userId = req.userId;
     const transaction = await transactionModel.findOne({ _id: id, userId });
     if (!transaction) {
       return res.status(404).json({
@@ -103,8 +105,8 @@ const deleteTransaction = async (req, res) => {
 const editTransaction = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, amount, type, category, note } = req.body;
-    const userId = req.userId; // Get user ID from authenticated request
+    const { title, amount, type, category, note, date } = req.body;
+    const userId = req.userId;
     const transaction = await transactionModel.findOne({ _id: id, userId });
     if (!transaction) {
       return res.status(404).json({
@@ -115,12 +117,13 @@ const editTransaction = async (req, res) => {
     // Update fields if provided
     if (title) transaction.title = title;
     if (amount !== undefined) transaction.amount = amount;
-    if (typeof type === 'string') {
-      const normalizedTypeUpdate = type === 'Saving' ? 'Saving' : 'Debit';
+    if (typeof type === "string") {
+      const normalizedTypeUpdate = type === "Saving" ? "Saving" : "Debit";
       transaction.type = normalizedTypeUpdate;
     }
     if (category) transaction.category = category;
     if (note !== undefined) transaction.note = note;
+    if (date) transaction.date = date;
     await transaction.save();
     res.json({
       success: true,
@@ -136,10 +139,50 @@ const editTransaction = async (req, res) => {
   }
 };
 
+const getSummary = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { type } = req.query;
+
+    let match = { userId: new mongoose.Types.ObjectId(userId) };
+    if (type && type !== "All") {
+      match.type = type;
+    }
+
+    const summary = await transactionModel.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$date" },
+            month: { $month: "$date" },
+          },
+          total: { $sum: "$amount" },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]);
+
+    const monthly = summary.map((item) => ({
+      year: item._id.year,
+      month: item._id.month,
+      total: item.total,
+    }));
+
+    const total = monthly.reduce((acc, curr) => acc + curr.total, 0);
+
+    res.json({ success: true, total, monthly });
+  } catch (error) {
+    console.error("Get summary error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export {
   addTransaction,
   getTransactions,
   editTransaction,
   getTransactionById,
   deleteTransaction,
+  getSummary,
 };

@@ -123,7 +123,7 @@ const Table = () => {
         title: data.title,
         amount: Number(String(data.amount).replace(/[^0-9.-]/g, "")),
         type: data.type,
-        category: data.type, // temporary mapping; adjust when category UI exists
+        category: data.type,
         date: data.date ? new Date(data.date) : undefined,
       };
 
@@ -137,7 +137,6 @@ const Table = () => {
         if (!json.success) throw new Error(json.message || "Update failed");
         setIsEditOpen(false);
         setEditingRow(null);
-        // Refresh list to reflect backend truth
         fetchTransactions();
       } else {
         const res = await fetch(`${API_BASE}/api/transaction`, {
