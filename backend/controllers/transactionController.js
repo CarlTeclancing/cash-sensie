@@ -5,16 +5,18 @@ const addTransaction = async (req, res) => {
   try {
     const { title, emoji, amount, type, category, note } = req.body;
     const userId = req.userId;
-    if (!title || !amount || !type || !category) {
+    const normalizedType = type === 'Saving' ? 'Saving' : 'Debit';
+    if (!title || !amount || !category) {
       return res.status(400).json({
         success: false,
-        message: "All fields except note are required",
+        message: "title, amount and category are required",
       });
     }
     const newTransaction = new transactionModel({
       userId,
       title,
       emoji,
+      type: normalizedType,
       amount,
       category,
       note,
@@ -52,7 +54,7 @@ const getTransactions = async (req, res) => {
 const getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.userId; // Get user ID from authenticated request
+    const userId = req.userId; 
     const transaction = await transactionModel.findOne({ _id: id, userId });
     if (!transaction) {
       return res.status(404).json({
@@ -112,10 +114,13 @@ const editTransaction = async (req, res) => {
     }
     // Update fields if provided
     if (title) transaction.title = title;
-    if (amount) transaction.amount = amount;
-    if (type) transaction.type = type;
+    if (amount !== undefined) transaction.amount = amount;
+    if (typeof type === 'string') {
+      const normalizedTypeUpdate = type === 'Saving' ? 'Saving' : 'Debit';
+      transaction.type = normalizedTypeUpdate;
+    }
     if (category) transaction.category = category;
-    if (note) transaction.note = note;
+    if (note !== undefined) transaction.note = note;
     await transaction.save();
     res.json({
       success: true,

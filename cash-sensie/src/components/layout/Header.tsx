@@ -11,7 +11,7 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 
 const Header = () => {
   const { width } = useWindowSize();
-  const { isDarkMode, toggleAddTransactionsForm } = useAppStore();
+  const { isDarkMode, toggleAddTransactionsForm, user } = useAppStore();
   const location = useLocation();
   const page = location.pathname.split("/")[1];
   const arrangedPage = page[0]?.toUpperCase() + page.slice(1).toLowerCase();
@@ -31,7 +31,7 @@ const Header = () => {
               color: `${isDarkMode ? COLORS.white : COLORS.headerGrey}`,
             }}
           >
-            Hi Yuven Carlson!
+            {`Hi ${user?.name || user?.email || 'User'}!`}
           </span>
           <span
             className="text-3xl font-medium"
@@ -100,9 +100,16 @@ const Header = () => {
           <Plus color={COLORS.white} size={20} className="lg:mr-3" />
           <span className="hidden lg:flex" color={COLORS.white}>Add Transaction</span>
         </button>
-        <Link to="/settings">
-          <img src={pict} alt="Avatar" className="w-13 h-13 rounded-full" />
-        </Link>
+        <div className="flex items-center gap-4">
+          {user?.settings?.currencies && (
+            <span className="text-sm font-medium" style={{ color: isDarkMode ? COLORS.white : COLORS.black }}>
+              Currency: {user.settings.currencies}
+            </span>
+          )}
+          <Link to="/settings">
+            <img src={pict} alt="Avatar" className="w-13 h-13 rounded-full" />
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,15 @@
 import { create } from "zustand";
 import axios from "axios"; 
 
+interface User {
+  id?: string;
+  name?: string;
+  email?: string;
+  createdAt?: string;
+  settings?: any;
+  profile?: any;
+}
+
 interface registrationDataType {
   name: string;
   password: string;
@@ -29,7 +38,10 @@ interface AppState {
   userId: string | null;
   userToken: string | null;
   userLoggedIn: boolean;
+  user: User | null;
   isDarkMode: boolean;
+  setUser: (u: User | null) => void;
+  updateUser: (partial: Partial<User>) => void;
   currentRegisterPage?: number;
   registrationData: registrationDataType;
   completedPagesRegister: number;
@@ -56,6 +68,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   userId: null,
   userToken: null,
   userLoggedIn: false,
+  user: null,
   isDarkMode: false,
   currentRegisterPage: 1,
   completedPagesRegister: 0,
@@ -91,6 +104,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   updateCompletedPagesRegister: (page: number) =>
     set(() => ({ completedPagesRegister: page })),
   
+  setUser: (u) => set({ user: u }),
+  updateUser: (partial) =>
+    set((state) => ({
+      user: state.user ? { ...state.user, ...partial } : ({ ...partial } as any),
+    })),
   
   toggleAddTransactionsForm: () => 
     set((state) => ({ 

@@ -22,13 +22,13 @@ type SettingsData = {
 type MenuTab = "profile" | "general" | "password" | "currency" | "feedback";
 
 const Settings = () => {
-  const { isDarkMode } = useAppStore();
+  const { isDarkMode, setUser } = useAppStore();
   const { width } = useWindowSize();
   const [activeMenu, setActiveMenu] = useState<MenuTab>("profile");
   const [isChanged, setIsChanged] = useState(false);
   const [initialData, setInitialData] = useState<SettingsData>({
-    fullName: "John Doe",
-    email: "john@example.com",
+    fullName: "",
+    email: "",
     address: "",
     occupation: "",
     dateOfBirth: "",
@@ -40,6 +40,43 @@ const Settings = () => {
   });
   const [formData, setFormData] = useState<SettingsData>(initialData);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [serverSettings, setServerSettings] = useState<any>(null);
+
+  const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:4000";
+  function getToken() {
+    try { return localStorage.getItem('token') || ''; } catch { return ''; }
+  }
+
+  // Fetch user profile on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/user/profile`, {
+          headers: { 'Authorization': `Bearer ${getToken()}` },
+        });
+        const json = await res.json();
+        if (json.success && json.user) {
+          const user = json.user;
+          const next: SettingsData = {
+            fullName: user.name || "",
+            email: user.email || "",
+            address: user.profile?.address || "",
+            occupation: user.profile?.occupation || "",
+            dateOfBirth: user.profile?.dateOfBirth ? String(user.profile.dateOfBirth).slice(0,10) : "",
+            oldPassword: "",
+            newPassword: "",
+            currency: user.settings?.currencies || "USD",
+            feedback: "",
+            profilePicture: profilePict,
+          };
+          setInitialData(next);
+          setFormData(next);
+          setServerSettings(user.settings || {});
+          setUser(user);
+        }
+      } catch (e) { console.error(e); }
+    })();
+  }, []);
 
   const handleProfilePictureChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -70,11 +107,51 @@ const Settings = () => {
     }));
   };
 
-  const handleSaveChanges = () => {
-    setInitialData(formData);
-    setIsChanged(false);
-    // Add API call here to save to backend
-    console.log("Changes saved:", formData);
+  const handleSaveChanges = async () => {
+    try {
+      const notifications = serverSettings?.notifications ?? { email: true, sms: false, push: false };
+      const settingsPayload = { ...(serverSettings || {}), currencies: formData.currency, notifications };
+      const body: any = {
+        name: formData.fullName,
+        email: formData.email,
+        settings: settingsPayload,
+        profile: {
+          address: formData.address,
+          occupation: formData.occupation,
+          dateOfBirth: formData.dateOfBirth || undefined,
+        },
+      };
+      const res = await fetch(`${API_BASE}/api/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || 'Update failed');
+      const user = json.user;
+      setUser(user);
+      const next: SettingsData = {
+        fullName: user.name || "",
+        email: user.email || "",
+        address: user.profile?.address || "",
+        occupation: user.profile?.occupation || "",
+        dateOfBirth: user.profile?.dateOfBirth ? String(user.profile.dateOfBirth).slice(0,10) : "",
+        oldPassword: "",
+        newPassword: "",
+        currency: user.settings?.currencies || "USD",
+        feedback: "",
+        profilePicture: formData.profilePicture,
+      };
+      setInitialData(next);
+      setFormData(next);
+      setServerSettings(json.user?.settings || settingsPayload);
+      setIsChanged(false);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleSendFeedback = () => {
@@ -504,23 +581,43 @@ const Settings = () => {
                 </div>
 
                 <button
-                  onClick={handleSaveChanges}
-                  disabled={!isChanged}
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`${API_BASE}/api/user/change-password`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${getToken()}`,
+                        },
+                        body: JSON.stringify({
+                          currentPassword: formData.oldPassword,
+                          newPassword: formData.newPassword,
+                        })
+                      });
+                      const json = await res.json();
+                      if (!json.success) throw new Error(json.message || 'Change password failed');
+                      // reset password fields
+                      setFormData((prev) => ({ ...prev, oldPassword: '', newPassword: '' }));
+                      alert('Password changed successfully');
+                    } catch (e) {
+                      console.error(e);
+                      alert('Password change failed');
+                    }
+                  }}
+                  disabled={!formData.oldPassword || !formData.newPassword}
                   className="px-6 py-2 rounded-lg font-semibold transition-all mt-4"
                   style={{
                     backgroundColor: isDarkMode
                       ? DARK_MODE_COLORS.blue
                       : COLORS.blue,
-                    color: isChanged
-                      ? COLORS.white
-                      : isDarkMode
-                        ? "rgba(255, 255, 255, 0.5)"
-                        : "rgba(255, 255, 255, 0.6)",
-                    cursor: isChanged ? "pointer" : "not-allowed",
-                    opacity: isChanged ? 1 : 0.6,
+                    color: (!formData.oldPassword || !formData.newPassword)
+                      ? (isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.6)')
+                      : COLORS.white,
+                    cursor: (!formData.oldPassword || !formData.newPassword) ? 'not-allowed' : 'pointer',
+                    opacity: (!formData.oldPassword || !formData.newPassword) ? 0.6 : 1,
                   }}
                 >
-                  Save Changes
+                  Update Password
                 </button>
               </div>
             )}
