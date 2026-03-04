@@ -48,6 +48,8 @@ interface AppState {
   isAddtransactionsFormVisible: boolean;
   
   transactions: TransactionData[];
+  transactionFilterType: 'All' | 'Debit' | 'Saving';
+  setTransactionFilterType: (t: 'All' | 'Debit' | 'Saving') => void;
   currentTransactionMode?: "add" | "edit";
   currentTransactionData?: TransactionData | null;
   toggleAddTransactionsForm: () => void;
@@ -85,6 +87,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   
   transactions: [],
+  transactionFilterType: 'All',
+  setTransactionFilterType: (t) => set({ transactionFilterType: t }),
   currentTransactionMode: "add",
   currentTransactionData: null,
   

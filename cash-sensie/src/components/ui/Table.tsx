@@ -39,7 +39,7 @@ function formatAmount(n: number, type: "Debit" | "Saving") {
 }
 
 const Table = () => {
-  const { isDarkMode } = useAppStore();
+  const { isDarkMode, transactionFilterType } = useAppStore();
   const windowSize = useWindowSize();
   const isMobile = windowSize.width <= MOBILE_SIZE;
   const [rows, setRows] = useState<Row[]>([]);
@@ -48,14 +48,21 @@ const Table = () => {
     null,
   );
 
-  const headers = useMemo(() => ({
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
-  }), []);
+  const headers = useMemo(
+    () => ({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    }),
+    [],
+  );
 
   const fetchTransactions = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/transaction`, { headers });
+      const q =
+        transactionFilterType && transactionFilterType !== "All"
+          ? `?type=${encodeURIComponent(transactionFilterType)}`
+          : "";
+      const res = await fetch(`${API_BASE}/api/transaction${q}`, { headers });
       const data = await res.json();
       if (!data.success) throw new Error(data.message || "Failed to fetch");
       const mapped: Row[] = (data.transactions || []).map((t: any) => ({
@@ -66,7 +73,11 @@ const Table = () => {
         type: (t.type as "Debit" | "Saving") || "Debit",
         amount: formatAmount(Number(t.amount || 0), (t.type as any) || "Debit"),
       }));
-      setRows(mapped);
+      if (transactionFilterType && transactionFilterType !== "All") {
+        setRows(mapped.filter((item) => item.type === transactionFilterType));
+      } else {
+        setRows(mapped);
+      }
     } catch (e) {
       console.error(e);
       setRows([]);
@@ -75,7 +86,8 @@ const Table = () => {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transactionFilterType]);
 
   const handleEdit = (id: string) => {
     const row = rows.find((item) => item.id === id);

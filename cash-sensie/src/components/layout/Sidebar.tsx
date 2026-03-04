@@ -22,6 +22,7 @@ import { useLocation } from "react-router";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { MOBILE_SIZE } from "../../constants/constants";
 import MobileMenuButton from "../ui/MobileMenuButton";
+import { useNavigate } from "react-router";
 import dashboardIconRed from "../../assets/dashboard-icon-red.png";
 import savingsRedIcon from "../../assets/savings-icon-red.png";
 import debitsRedIcon from "../../assets/debits-icon-red.png";
@@ -32,7 +33,9 @@ const Sidebar = () => {
   const { width } = useWindowSize();
   const location = useLocation().pathname;
   const firstLocation = location.split(`/`).filter(Boolean)[0] || "dashboard";
-  const { isDarkMode, toggleAddTransactionsForm } = useAppStore();
+  const { isDarkMode, toggleAddTransactionsForm, setTransactionFilterType } =
+    useAppStore();
+  const navigate = useNavigate();
   const isActive = (location: string) =>
     location.toLowerCase() === firstLocation.toLowerCase();
   return (
@@ -62,12 +65,19 @@ const Sidebar = () => {
               icon={dashbIcon}
               iconActive={dashboardIconRed}
             />
-            <MobileMenuButton
-              content="Transactions"
-              isActive={isActive("transactions")}
-              icon={transactions}
-              iconActive={transactionsRedIcon}
-            />
+            <div
+              onClick={() => {
+                setTransactionFilterType("All");
+                navigate("/transactions");
+              }}
+            >
+              <MobileMenuButton
+                content="Transactions"
+                isActive={isActive("transactions")}
+                icon={transactions}
+                iconActive={transactionsRedIcon}
+              />
+            </div>
             <MobileMenuButton
               content="Notes"
               isActive={isActive("notes")}
@@ -81,18 +91,32 @@ const Sidebar = () => {
               icon={taxes}
               iconActive={taxesFocus}
             />
-            <MobileMenuButton
-              content="Savings"
-              isActive={isActive("savings")}
-              icon={savings}
-              iconActive={savingsRedIcon}
-            />
-            <MobileMenuButton
-              content="Debits"
-              isActive={isActive("debits")}
-              icon={debits}
-              iconActive={debitsRedIcon}
-            />
+            <div
+              onClick={() => {
+                setTransactionFilterType("Saving");
+                navigate("/transactions");
+              }}
+            >
+              <MobileMenuButton
+                content="Savings"
+                isActive={isActive("savings")}
+                icon={savings}
+                iconActive={savingsRedIcon}
+              />
+            </div>
+            <div
+              onClick={() => {
+                setTransactionFilterType("Debit");
+                navigate("/transactions");
+              }}
+            >
+              <MobileMenuButton
+                content="Debits"
+                isActive={isActive("debits")}
+                icon={debits}
+                iconActive={debitsRedIcon}
+              />
+            </div>
           </div>
         </>
       ) : (
@@ -109,24 +133,48 @@ const Sidebar = () => {
               icon={dashbIcon}
               iconActive={dashbIconActive}
             />
-            <MenuButton
-              content="Transactions"
-              isActive={isActive("transactions")}
-              icon={transactions}
-              iconActive={transactionsFocus}
-            />
-            <MenuButton
-              content="Savings"
-              isActive={isActive("savings")}
-              icon={savings}
-              iconActive={savingsFocus}
-            />
-            <MenuButton
-              content="Debits"
-              isActive={isActive("debits")}
-              icon={debits}
-              iconActive={debitsFocus}
-            />
+            <div
+              onClick={() => {
+                setTransactionFilterType("All");
+                navigate("/transactions");
+              }}
+              className="w-full"
+            >
+              <MenuButton
+                content="Transactions"
+                isActive={isActive("transactions")}
+                icon={transactions}
+                iconActive={transactionsFocus}
+              />
+            </div>
+            <div
+              onClick={() => {
+                setTransactionFilterType("Saving");
+                navigate("/transactions");
+              }}
+              className="w-full"
+            >
+              <MenuButton
+                content="Savings"
+                isActive={isActive("savings")}
+                icon={savings}
+                iconActive={savingsFocus}
+              />
+            </div>
+            <div
+              onClick={() => {
+                setTransactionFilterType("Debit");
+                navigate("/transactions");
+              }}
+              className="w-full"
+            >
+              <MenuButton
+                content="Debits"
+                isActive={isActive("debits")}
+                icon={debits}
+                iconActive={debitsFocus}
+              />
+            </div>
             <MenuButton
               content="Notes"
               isActive={isActive("notes")}
