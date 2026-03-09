@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { COLORS, DARK_MODE_COLORS } from "../../constants/constants";
 import { useAppStore } from "../../store/store";
 import bar1 from "../../assets/bar-icon-1.png";
@@ -20,8 +20,22 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 import { MOBILE_SIZE } from "../../constants/constants";
 
 const SummaryComp = () => {
-  const { isDarkMode } = useAppStore();
+  const { isDarkMode, summary, fetchSummary, transactionFilterType, user } = useAppStore();
   const { width } = useWindowSize();
+
+  useEffect(() => {
+    fetchSummary();
+  }, [transactionFilterType]);
+
+  const formatCurrency = (amount: number) => {
+    const currency = user?.settings?.currencies || 'XAF';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(amount);
+  };
 
   return (
     <div
@@ -61,7 +75,7 @@ const SummaryComp = () => {
               color: `${COLORS.black}`,
             }}
           >
-            $682.5
+            {formatCurrency(summary.totalSpent)}
           </span>
         </div>
         <div className="flex gap-2.5">
@@ -101,7 +115,7 @@ const SummaryComp = () => {
               color: `${COLORS.black}`,
             }}
           >
-            $682.5
+            {formatCurrency(summary.totalDebits)}
           </span>
         </div>
         <img src={debitsLine} />
@@ -138,7 +152,7 @@ const SummaryComp = () => {
               color: `${COLORS.black}`,
             }}
           >
-            $682.5
+            {formatCurrency(summary.totalSavings)}
           </span>
         </div>
       </div>
@@ -163,7 +177,7 @@ const SummaryComp = () => {
               color: `${COLORS.white}`,
             }}
           >
-            $682.5
+            {formatCurrency(summary.totalSaved)}
           </span>
         </div>
         <img src={totalSavedLine} />

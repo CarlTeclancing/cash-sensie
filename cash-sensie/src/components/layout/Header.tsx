@@ -68,7 +68,7 @@ const Header = () => {
       {/* Mobile Avatar */}
       <Link to="/settings">
         <img
-          src={pict}
+          src={user?.profile?.avatar || pict}
           alt="Avatar"
           className="w-13 h-13 md:hidden rounded-full"
         />
@@ -107,7 +107,7 @@ const Header = () => {
             </span>
           )}
           <Link to="/settings">
-            <img src={pict} alt="Avatar" className="w-13 h-13 rounded-full" />
+            <img src={user?.profile?.avatar || pict} alt="Avatar" className="w-13 h-13 rounded-full" />
           </Link>
         </div>
       </div>

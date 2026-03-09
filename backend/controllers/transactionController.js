@@ -178,6 +178,82 @@ const getSummary = async (req, res) => {
   }
 };
 
+const getDashboardSummary = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const currentMonth = new Date().getMonth() + 1;
+    const currentYear = new Date().getFullYear();
+
+    // Get current month's spending
+    const currentMonthSpent = await transactionModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: 'Debit',
+          $expr: {
+            $and: [
+              { $eq: [{ $month: "$date" }, currentMonth] },
+              { $eq: [{ $year: "$date" }, currentYear] }
+            ]
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    // Get total debits
+    const totalDebits = await transactionModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: 'Debit'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    // Get total savings
+    const totalSavings = await transactionModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+          type: 'Saving'
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        totalSpent: currentMonthSpent[0]?.total || 0,
+        totalDebits: totalDebits[0]?.total || 0,
+        totalSavings: totalSavings[0]?.total || 0,
+        totalSaved: totalSavings[0]?.total || 0,
+      }
+    });
+  } catch (error) {
+    console.error("Get dashboard summary error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export {
   addTransaction,
   getTransactions,
@@ -185,4 +261,5 @@ export {
   getTransactionById,
   deleteTransaction,
   getSummary,
+  getDashboardSummary,
 };

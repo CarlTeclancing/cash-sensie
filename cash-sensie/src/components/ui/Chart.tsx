@@ -26,9 +26,20 @@ function monthLabel(y: number, m: number) {
 }
 
 const Chart = () => {
-  const { isDarkMode, transactionFilterType } = useAppStore();
+  const { isDarkMode, transactionFilterType, user } = useAppStore();
   const [series, setSeries] = useState<SeriesPoint[]>([]);
   const [total, setTotal] = useState(0);
+
+  const currency = user?.settings?.currencies || 'USD';
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    }).format(amount);
+  };
 
   const title = useMemo(() => {
     if (transactionFilterType === "Saving") return "Total Savings";
@@ -101,7 +112,7 @@ const Chart = () => {
               color: `${isDarkMode ? COLORS.white : COLORS.black}`,
             }}
           >
-            ${total.toFixed(2)}
+            {formatCurrency(total)}
           </span>
         </div>
         <div
@@ -132,10 +143,10 @@ const Chart = () => {
             color: `${isDarkMode ? DARK_MODE_COLORS.blue : COLORS.blue}`,
           }}
         >
-          ${(maxVal / 2).toFixed(0)}
+          {formatCurrency(maxVal / 2)}
         </span>
       </div>
-      <div className="flex items-center justify-between w-full h-40 items-end gap-2">
+      <div className="flex items-center justify-between w-full h-40 gap-2">
         {series.length === 0 ? (
           <div className="w-full text-center text-gray-500">No data</div>
         ) : (

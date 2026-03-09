@@ -67,7 +67,7 @@ const Settings = () => {
             newPassword: "",
             currency: user.settings?.currencies || "USD",
             feedback: "",
-            profilePicture: profilePict,
+            profilePicture: user.profile?.avatar || profilePict,
           };
           setInitialData(next);
           setFormData(next);
@@ -84,12 +84,37 @@ const Settings = () => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setFormData((prev) => ({
-          ...prev,
-          profilePicture: result,
-        }));
+      reader.onloadend = async () => {
+        const base64Image = reader.result as string;
+        
+        // Show loading state (optional)
+        setIsChanged(true);
+        
+        // Upload image to Firebase Storage via backend
+        try {
+          const uploadRes = await fetch(`${API_BASE}/api/user/upload-image`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${getToken()}`,
+            },
+            body: JSON.stringify({ image: base64Image }),
+          });
+          
+          const uploadData = await uploadRes.json();
+          if (uploadData.success) {
+            setFormData((prev) => ({
+              ...prev,
+              profilePicture: uploadData.imageUrl,
+            }));
+          } else {
+            console.error('Image upload failed:', uploadData.message);
+            alert('Failed to upload image');
+          }
+        } catch (error) {
+          console.error('Image upload error:', error);
+          alert('Failed to upload image');
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -119,10 +144,11 @@ const Settings = () => {
           address: formData.address,
           occupation: formData.occupation,
           dateOfBirth: formData.dateOfBirth || undefined,
+          avatar: formData.profilePicture !== profilePict ? formData.profilePicture : undefined,
         },
       };
-      const res = await fetch(`${API_BASE}/api/user/profile`, {
-        method: 'PUT',
+      const res = await fetch(`${API_BASE}/api/user/update-profile`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getToken()}`,
@@ -143,14 +169,16 @@ const Settings = () => {
         newPassword: "",
         currency: user.settings?.currencies || "USD",
         feedback: "",
-        profilePicture: formData.profilePicture,
+        profilePicture: user.profile?.avatar || formData.profilePicture,
       };
       setInitialData(next);
       setFormData(next);
       setServerSettings(json.user?.settings || settingsPayload);
       setIsChanged(false);
+      alert('Profile updated successfully');
     } catch (e) {
       console.error(e);
+      alert('Failed to save changes');
     }
   };
 

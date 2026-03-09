@@ -2,8 +2,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import userModel from "../model/userModel.js";
+import { storage } from "../config/firebase.js";
+import { v4 as uuidv4 } from "uuid";
 
-// Create JWT Token
+
 const createToken = (id) => {
   if (!process.env.JWT_SECRET) {
     console.error(
@@ -15,7 +17,7 @@ const createToken = (id) => {
   });
 };
 
-// Validate password strength
+
 const validatePassword = (password) => {
   const minLength = 8;
   const hasUpperCase = /[A-Z]/.test(password);
@@ -50,7 +52,7 @@ const validatePassword = (password) => {
   return { valid: true };
 };
 
-// Route for user registration
+
 const registerUser = async (req, res) => {
   try {
     const {
@@ -72,7 +74,6 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Check if user already exists
     const exists = await userModel.findOne({ email });
     if (exists) {
       return res.status(409).json({
@@ -81,7 +82,6 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Validate email format
     if (!validator.isEmail(email)) {
       return res.status(400).json({
         success: false,
@@ -89,7 +89,6 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
       return res.status(400).json({
@@ -98,7 +97,7 @@ const registerUser = async (req, res) => {
       });
     }
 
-    // Hash password
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -137,12 +136,11 @@ const registerUser = async (req, res) => {
     });
   }
 };
-// Route for user login
+
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -209,6 +207,7 @@ const getUserProfile = async (req, res) => {
         email: user.email,
         createdAt: user.createdAt,
         settings: user.settings || {},
+        profile: user.profile || {},
       },
     });
   } catch (error) {
@@ -220,12 +219,12 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// Update user profile/settings (protected route)
+
 const updateUserProfile = async (req, res) => {
   try {
     const { name, email, settings, profile } = req.body;
 
-    // Find user
+   
     const user = await userModel.findById(req.userId);
 
     if (!user) {
@@ -235,7 +234,7 @@ const updateUserProfile = async (req, res) => {
       });
     }
 
-    // Validate email if changed
+ 
     if (email && email !== user.email) {
       if (!validator.isEmail(email)) {
         return res.status(400).json({
@@ -244,7 +243,7 @@ const updateUserProfile = async (req, res) => {
         });
       }
 
-      // Check if new email is already taken
+
       const emailExists = await userModel.findOne({ email });
       if (emailExists) {
         return res.status(409).json({
@@ -255,17 +254,16 @@ const updateUserProfile = async (req, res) => {
       user.email = email;
     }
 
-    // Update name if provided
+ 
     if (name) {
       user.name = name;
     }
 
-    // Update settings if provided
     if (settings && typeof settings === "object") {
       user.settings = { ...user.settings, ...settings };
     }
 
-    // Update profile if provided
+  
     if (profile && typeof profile === "object") {
       if (profile.address) user.profile.address = profile.address;
       if (profile.occupation) user.profile.occupation = profile.occupation;
@@ -297,7 +295,6 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-// Change password (protected route)
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -318,7 +315,6 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Verify current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -327,7 +323,7 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Validate new password
+
     const passwordValidation = validatePassword(newPassword);
     if (!passwordValidation.valid) {
       return res.status(400).json({
@@ -336,7 +332,6 @@ const changePassword = async (req, res) => {
       });
     }
 
-    // Hash and update password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
@@ -354,10 +349,161 @@ const changePassword = async (req, res) => {
   }
 };
 
+const logoutUser = async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateProfile = async (req, res) => {
+//   try {
+//     const { name, email, profile, settings } = req.body;
+
+//     // Find the user
+//     const user = await userModel.findById(req.userId);
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+
+//     // Validate email if changed
+//     if (email && email !== user.email) {
+//       if (!validator.isEmail(email)) {
+//         return res.status(400).json({
+//           success: false,
+//           message: "Please enter a valid email",
+//         });
+//       }
+
+//       const emailExists = await userModel.findOne({ email });
+//       if (emailExists && emailExists._id.toString() !== req.userId) {
+//         return res.status(409).json({
+//           success: false,
+//           message: "Email already in use",
+//         });
+//       }
+//       user.email = email;
+//     }
+
+//     // Update name if provided
+//     if (name) {
+//       user.name = name;
+//     }
+
+//     // Update profile fields if provided
+//     if (profile && typeof profile === "object") {
+//       if (profile.address !== undefined) user.profile.address = profile.address;
+//       if (profile.occupation !== undefined) user.profile.occupation = profile.occupation;
+//       if (profile.dateOfBirth !== undefined) user.profile.dateOfBirth = profile.dateOfBirth;
+//       if (profile.bio !== undefined) user.profile.bio = profile.bio;
+//       if (profile.phone !== undefined) user.profile.phone = profile.phone;
+      
+//       // Handle avatar upload from Firebase Storage URL
+//       if (profile.avatar !== undefined) {
+//         user.profile.avatar = profile.avatar;
+//       }
+//     }
+
+//     // Update settings if provided
+//     if (settings && typeof settings === "object") {
+//       user.settings = { ...user.settings, ...settings };
+//     }
+
+//     await user.save();
+
+//     res.json({
+//       success: true,
+//       message: "Profile updated successfully",
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         settings: user.settings || {},
+//         profile: user.profile || {},
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Update profile error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+};
+
+const uploadProfileImage = async (req, res) => {
+//   try {
+//     const { image } = req.body;
+
+//     if (!image) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Image data is required",
+//       });
+//     }
+
+//     // Check if image is a base64 data URL
+//     const matches = image.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/);
+//     if (!matches) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid image format. Please provide a base64 encoded image.",
+//       });
+//     }
+
+//     const imageType = matches[1];
+//     const base64Data = matches[2];
+//     const imageBuffer = Buffer.from(base64Data, "base64");
+
+//     // Generate unique filename
+//     const filename = `profile-images/${req.userId}-${uuidv4()}.${imageType}`;
+
+//     // Upload to Firebase Storage
+//     const bucket = storage.bucket();
+//     const file = bucket.file(filename);
+
+//     await file.save(imageBuffer, {
+//       metadata: {
+//         contentType: `image/${imageType}`,
+//       },
+//       public: true,
+//     });
+
+//     // Get the public URL
+//     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+
+//     res.json({
+//       success: true,
+//       message: "Image uploaded successfully",
+//       imageUrl: publicUrl,
+//     });
+//   } catch (error) {
+//     console.error("Upload profile image error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+};
+
 export {
   loginUser,
   registerUser,
   getUserProfile,
   updateUserProfile,
   changePassword,
+  logoutUser,
+  updateProfile,
+  uploadProfileImage,
 };

@@ -89,6 +89,7 @@ const Login = ({ isDarkMode }: props) => {
       });
 
       useAppStore.getState().fetchTransactions();
+      useAppStore.getState().fetchSummary();
         navigate("/");
       }
     } catch (error: any) {

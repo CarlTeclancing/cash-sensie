@@ -46,7 +46,7 @@ interface AppState {
   registrationData: registrationDataType;
   completedPagesRegister: number;
   isAddtransactionsFormVisible: boolean;
-  
+
   transactions: TransactionData[];
   transactionFilterType: 'All' | 'Debit' | 'Saving';
   setTransactionFilterType: (t: 'All' | 'Debit' | 'Saving') => void;
@@ -58,12 +58,22 @@ interface AppState {
   incrementRegisterPage?: () => void;
   toggleDarkMode: () => void;
   updateRegistrationData: (newRegistrationData: registrationDataType) => void;
-  
+
   addTransaction: (transaction: Omit<TransactionData, 'id'>) => Promise<void>;
   updateTransaction: (id: string, data: Partial<TransactionData>) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   fetchTransactions: () => Promise<void>;
   setTransactionMode: (mode: "add" | "edit", data?: TransactionData) => void;
+  logout: () => void;
+  
+  // Summary state
+  summary: {
+    totalSpent: number;
+    totalDebits: number;
+    totalSavings: number;
+    totalSaved: number;
+  };
+  fetchSummary: () => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -91,6 +101,13 @@ export const useAppStore = create<AppState>((set, get) => ({
   setTransactionFilterType: (t) => set({ transactionFilterType: t }),
   currentTransactionMode: "add",
   currentTransactionData: null,
+
+  summary: {
+    totalSpent: 0,
+    totalDebits: 0,
+    totalSavings: 0,
+    totalSaved: 0,
+  },
   
   
   changeRegisterPage: (page: number) =>
@@ -186,6 +203,38 @@ addTransaction: async (transactionData: Omit<TransactionData, 'id'>) => {
       set({ transactions: response.data.transactions });
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    set({
+      userId: null,
+      userToken: null,
+      userLoggedIn: false,
+      user: null,
+      transactions: [],
+    });
+  },
+
+  fetchSummary: async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get("http://localhost:4000/api/transaction/dashboard-summary", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      set({
+        summary: response.data.data || {
+          totalSpent: 0,
+          totalDebits: 0,
+          totalSavings: 0,
+          totalSaved: 0,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to fetch summary:", error);
     }
   }
 }));

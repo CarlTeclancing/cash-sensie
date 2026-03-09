@@ -33,11 +33,16 @@ const Sidebar = () => {
   const { width } = useWindowSize();
   const location = useLocation().pathname;
   const firstLocation = location.split(`/`).filter(Boolean)[0] || "dashboard";
-  const { isDarkMode, toggleAddTransactionsForm, setTransactionFilterType } =
+  const { isDarkMode, toggleAddTransactionsForm, setTransactionFilterType, logout } =
     useAppStore();
   const navigate = useNavigate();
   const isActive = (location: string) =>
     location.toLowerCase() === firstLocation.toLowerCase();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   return (
     <div
       className="w-full py-4   fixed bottom-0 left-0 md:bottom-auto md:top-0  md:w-1/5 flex items-center justify-center md:justify-between h-1/9 md:h-screen flex-row md:flex-col rounded-t-3xl px-0.5 md:px-0 md:rounded-t-none z-50"
@@ -194,7 +199,7 @@ const Sidebar = () => {
               iconActive={settingsFocus}
             />
           </div>
-          <div className="flex w-10/11 cursor-pointer">
+          <div className="flex w-10/11 cursor-pointer" onClick={handleLogout}>
             <img src={logoutIcon} alt="" className="mr-2" />
             <span style={{ color: COLORS.grey }}>Logout</span>
           </div>

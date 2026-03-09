@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SummaryComp from "../components/ui/SummaryComp";
 import Chart from "../components/ui/Chart";
+import { useAppStore } from "../store/store";
 
 const Dashboard = () => {
+  const { fetchSummary } = useAppStore();
+
+  useEffect(() => {
+    fetchSummary();
+  }, []);
+
   return (
     <div className="flex w-full items-center justify-center mt-4">
       <div className="flex w-full md:w-full lg:flex-row md:flex-col justify-center md:justify-center gap-6  lg:px-4">

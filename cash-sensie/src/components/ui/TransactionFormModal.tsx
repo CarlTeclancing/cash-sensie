@@ -14,7 +14,7 @@ export type TransactionFormData = {
   id?: string;
   title: string;
   date: string;
-  type: "Debit" | "Saving";
+  type: "Income" | "Expenses";
   amount: string;
 };
 
@@ -29,7 +29,7 @@ type TransactionFormModalProps = {
 const emptyForm: TransactionFormData = {
   title: "",
   date: "",
-  type: "Debit",
+  type: "Expenses",
   amount: "",
 };
 
@@ -155,7 +155,7 @@ const TransactionFormModal = ({
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
-                        type: e.target.value as "Debit" | "Saving",
+                        type: e.target.value as "Income" | "Expenses",
                       }))
                     }
                     className="w-full focus:outline-none h-9 rounded-md px-2"
@@ -165,8 +165,8 @@ const TransactionFormModal = ({
                       }`,
                     }}
                   >
-                    <option value="Debit">Debit</option>
-                    <option value="Saving">Saving</option>
+                    <option value="Income">Income</option>
+                    <option value="Expenses">Expenses</option>
                   </select>
                 </div>
 
@@ -200,7 +200,7 @@ const TransactionFormModal = ({
                     Cancel
                   </button>
                   <button
-                    className="px-4 py-2 rounded-md font-semibold"
+                    className="px-4 py-2 rounded-md font-semibold cursor-pointer"
                     style={{
                       backgroundColor: isValid
                         ? isDarkMode
