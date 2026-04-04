@@ -70,8 +70,8 @@ const Table = () => {
         icon: t.emoji || "💳",
         title: t.title,
         date: formatDate(t.date),
-        type: (t.type as "Debit" | "Saving") || "Debit",
-        amount: formatAmount(Number(t.amount || 0), (t.type as any) || "Debit"),
+        type: (t.type as "Debit" | "Saving"),
+        amount: formatAmount(Number(t.amount || 0), (t.type as any)),
       }));
       if (transactionFilterType && transactionFilterType !== "All") {
         setRows(mapped.filter((item) => item.type === transactionFilterType));
