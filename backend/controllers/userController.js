@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import userModel from "../model/userModel.js";
-import { storage } from "../config/firebase.js";
+// import { storage } from "../config/firebase.js";
 import { v4 as uuidv4 } from "uuid";
 
 
